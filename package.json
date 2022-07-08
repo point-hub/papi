@@ -1,0 +1,71 @@
+{
+  "name": "@point-hub/papi",
+  "version": "0.0.1",
+  "description": "Point API Framework",
+  "type": "module",
+  "main": "lib/index.js",
+  "files": [
+    "lib/",
+    "stub/"
+  ],
+  "scripts": {
+    "dev:compile": "tsc -w --project tsconfig.build.json",
+    "dev:resolve-path": "tsc-alias -w --project tsconfig.build.json",
+    "dev": "shx rm -rf lib && concurrently -k npm:dev:*",
+    "build:compile": "tsc --project tsconfig.build.json",
+    "build:resolve-path": "tsc-alias --project tsconfig.build.json",
+    "build": "shx rm -rf lib && npm run build:compile && npm run build:resolve-path",
+    "lint": "eslint ./src/**/*.ts",
+    "lint:fix": "npm run lint -- --fix",
+    "test": "NODE_OPTIONS=--experimental-vm-modules jest --runInBand",
+    "test:coverage": "shx rm -rf coverage && npm run test -- --coverage"
+  },
+  "keywords": [
+    "papi",
+    "express",
+    "api",
+    "boilerplate",
+    "framework"
+  ],
+  "author": "Martien Dermawan Tanama <martiendt@gmail.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/point-hub/papi.git"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.18.6",
+    "@babel/preset-env": "^7.18.6",
+    "@babel/preset-typescript": "^7.18.6",
+    "@types/compression": "^1.7.2",
+    "@types/cors": "^2.8.12",
+    "@types/express": "^4.17.13",
+    "@types/jest": "^28.1.4",
+    "@types/node": "^18.0.3",
+    "@types/shelljs": "^0.8.11",
+    "@types/supertest": "^2.0.12",
+    "@typescript-eslint/eslint-plugin": "^5.25.0",
+    "babel-jest": "^28.1.2",
+    "concurrently": "^7.2.2",
+    "eslint": "^8.15.0",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-import-resolver-typescript": "^3.2.4",
+    "eslint-plugin-import": "^2.26.0",
+    "eslint-plugin-prettier": "^4.2.1",
+    "jest": "^28.1.2",
+    "prettier": "^2.7.1",
+    "shx": "^0.3.4",
+    "supertest": "^6.2.4",
+    "tsc-alias": "^1.6.11",
+    "typescript": "^4.7.4"
+  },
+  "dependencies": {
+    "@point-hub/express-cli": "^0.2.2",
+    "@point-hub/express-error-handler": "^0.0.1",
+    "@point-hub/express-utils": "^0.0.14",
+    "shelljs": "^0.8.5"
+  },
+  "peerDependencies": {
+    "express": "^4.18.1"
+  }
+}
