@@ -20,6 +20,7 @@ function generateRandomName() {
 describe("make:command", () => {
   beforeAll(() => {
     jest.spyOn(console, "error").mockImplementation(() => "");
+    jest.spyOn(console, "info").mockImplementation(() => "");
   });
 
   it("should create new command", async () => {
