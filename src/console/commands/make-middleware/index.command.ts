@@ -62,6 +62,9 @@ export default class MakeMiddleware extends BaseCommand {
       .toString()
       .replace("new.middleware.js", `index.middleware.js`);
     fs.writeFileSync(`${process.cwd()}/src/middleware/${kebabCase(this.args.name)}/index.spec.ts`, stubTest);
+
+    console.info(`src/middleware/${kebabCase(this.args.name)}/index.middleware.ts`, "has been created");
+    console.info(`src/middleware/${kebabCase(this.args.name)}/index.spec.ts`, "has been created");
   }
 
   private copyConfigureableMiddleware() {
@@ -81,5 +84,8 @@ export default class MakeMiddleware extends BaseCommand {
       .toString()
       .replace("configurable.middleware.js", `index.middleware.js`);
     fs.writeFileSync(`${process.cwd()}/src/middleware/${kebabCase(this.args.name)}/index.spec.ts`, stubTest);
+
+    console.info(`src/middleware/${kebabCase(this.args.name)}/index.middleware.ts`, "has been created");
+    console.info(`src/middleware/${kebabCase(this.args.name)}/index.spec.ts`, "has been created");
   }
 }

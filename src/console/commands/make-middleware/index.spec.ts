@@ -20,6 +20,7 @@ function generateRandomName() {
 describe("make:middleware", () => {
   beforeAll(() => {
     jest.spyOn(console, "error").mockImplementation(() => "");
+    jest.spyOn(console, "info").mockImplementation(() => "");
   });
   it("should create new middleware", async () => {
     const makeMiddlewareCommand = new MakeMiddlewareCommand();

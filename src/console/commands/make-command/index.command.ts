@@ -47,5 +47,8 @@ export default class MakeCommand extends BaseCommand {
       .replace(/NewCommand/g, `${pascalCase(this.args.name)}Command`)
       .replace(/newCommand/g, `${camelCase(this.args.name)}Command`);
     fs.writeFileSync(`${process.cwd()}/src/console/commands/${kebabCase(this.args.name)}/index.spec.ts`, stubTest);
+
+    console.info(`src/console/commands/${kebabCase(this.args.name)}/index.command.ts`, "has been created");
+    console.info(`src/console/commands/${kebabCase(this.args.name)}/index.spec.ts`, "has been created");
   }
 }
