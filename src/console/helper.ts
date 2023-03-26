@@ -1,3 +1,3 @@
-import { URL } from "url";
+import { URL, fileURLToPath } from "url";
 
-export const stubDir = new URL("../../stub", import.meta.url).pathname;
+export const stubDir = fileURLToPath(new URL("../../stub", import.meta.url));

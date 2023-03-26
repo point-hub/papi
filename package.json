@@ -1,6 +1,6 @@
 {
   "name": "@point-hub/papi",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Point API Framework",
   "type": "module",
   "main": "lib/index.js",
@@ -17,7 +17,7 @@
     "build": "shx rm -rf lib && npm run build:compile && npm run build:resolve-path",
     "lint": "eslint ./src/**/*.ts",
     "lint:fix": "npm run lint -- --fix",
-    "test": "NODE_OPTIONS=--experimental-vm-modules jest --runInBand",
+    "test": "cross-env NODE_OPTIONS=--experimental-vm-modules jest --runInBand",
     "test:coverage": "shx rm -rf coverage && npm run test -- --coverage"
   },
   "keywords": [
@@ -47,6 +47,7 @@
     "@typescript-eslint/eslint-plugin": "^5.25.0",
     "babel-jest": "^28.1.2",
     "concurrently": "^7.2.2",
+    "cross-env": "^7.0.3",
     "eslint": "^8.15.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-import-resolver-typescript": "^3.2.4",
