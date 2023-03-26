@@ -1,9 +1,9 @@
-import { URL } from "url";
+import { URL, fileURLToPath } from "url";
 import { ExpressCli } from "@point-hub/express-cli";
 import { fileSearch } from "@point-hub/express-utils";
 
 export class ConsoleKernel {
-  public path = new URL(".", import.meta.url).pathname;
+  public path = fileURLToPath(new URL(".", import.meta.url));
   private command: ExpressCli;
 
   constructor(command: ExpressCli) {
@@ -14,7 +14,7 @@ export class ConsoleKernel {
    * Register the commands for the application.
    *
    * @example
-   * command.register(new ExampleCommand());
+   * this.command.register(new ExampleCommand());
    */
   async register() {
     const result = await fileSearch("/*.command.(js|ts)", this.path, { maxDeep: 2, regExp: true });
