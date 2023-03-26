@@ -1,6 +1,6 @@
 {
   "name": "@point-hub/papi",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Point API Framework",
   "type": "module",
   "main": "lib/index.js",
