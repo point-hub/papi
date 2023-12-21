@@ -1,10 +1,11 @@
-import { jest } from "@jest/globals";
-import NewCommand from "./index.command.js";
+import { expect, it, spyOn } from 'bun:test'
 
-it("test command", () => {
-  const newCommand = new NewCommand();
-  const spy = jest.spyOn(newCommand, "handle");
-  newCommand.handle();
+import NewCommand from './index.command'
 
-  expect(spy).toBeCalled();
-});
+it('test command', () => {
+  const newCommand = new NewCommand()
+  const spy = spyOn(newCommand, 'handle')
+  newCommand.handle()
+
+  expect(spy).toHaveBeenCalled()
+})

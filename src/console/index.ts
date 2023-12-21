@@ -1,13 +1,13 @@
-import { URL, fileURLToPath } from "url";
-import { ExpressCli } from "@point-hub/express-cli";
-import { fileSearch } from "@point-hub/express-utils";
+import { ExpressCli } from '@point-hub/express-cli'
+
+import MakeCommand from './commands/make-command/index.command'
+import MakeMiddleware from './commands/make-middleware/index.command'
 
 export class ConsoleKernel {
-  public path = fileURLToPath(new URL(".", import.meta.url));
-  private command: ExpressCli;
+  private command: ExpressCli
 
   constructor(command: ExpressCli) {
-    this.command = command;
+    this.command = command
   }
 
   /**
@@ -17,10 +17,7 @@ export class ConsoleKernel {
    * this.command.register(new ExampleCommand());
    */
   async register() {
-    const result = await fileSearch("/*.command.(js|ts)", this.path, { maxDeep: 2, regExp: true });
-    for (let i = 0; i < result.length; i++) {
-      const { default: Command } = await import(`./${result[i].path}`);
-      this.command.register(new Command());
-    }
+    this.command.register(new MakeCommand())
+    this.command.register(new MakeMiddleware())
   }
 }

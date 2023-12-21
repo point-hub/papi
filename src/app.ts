@@ -1,13 +1,13 @@
-import express, { Express, Request, Response } from "express";
+import express, { Express, Request, Response } from 'express'
 
 export async function createApp() {
-  const app: Express = express();
+  const app: Express = express()
 
-  app.get("/", (req: Request, res: Response) => {
+  app.get('/', (req: Request, res: Response) => {
     res.status(200).json({
-      message: "Papi",
-    });
-  });
+      message: 'Papi',
+    })
+  })
 
-  return app;
+  return app
 }
