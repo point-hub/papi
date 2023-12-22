@@ -85,11 +85,12 @@ export function convertStringToArray(fields: string): string[] {
  *
  * @example
  * convertArrayToObject(["name", "address"]) // => { name: 1, address: 1 }
+ * convertArrayToObject(["name", "address"], -1) // => { name: -1, address: -1 }
  */
-export function convertArrayToObject(array: string[]): IFieldsObject {
+export function convertArrayToObject(array: string[], value = 1): IFieldsObject {
   const obj: IFieldsObject = {}
   for (let i = 0; i < array.length; i++) {
-    obj[`${array[i].trim()}`] = 1
+    obj[`${array[i].trim()}`] = value
   }
   return obj
 }
