@@ -1,10 +1,10 @@
 {
   "name": "@point-hub/papi",
-  "version": "0.1.4",
+  "version": "0.1.7",
   "description": "Point API Framework",
   "type": "module",
   "main": "lib/index.js",
-  "types": "lib/index.d.ts",
+  "types": "lib/src/index.d.ts",
   "files": [
     "lib/",
     "stub/"
@@ -12,7 +12,8 @@
   "scripts": {
     "check-types": "tsc -p tsconfig.json",
     "dev": "shx rm -rf lib && bun run build.ts --watch",
-    "build": "shx rm -rf lib && bun run check-types && bun run build.ts",
+    "build": "shx rm -rf lib && bun run check-types && bun run build.ts && bun run build:declaration",
+    "build:declaration": "tsc -p tsconfig.types.json",
     "lint": "eslint ./src/**/*.ts",
     "lint:fix": "bun run lint -- --fix"
   },
@@ -50,7 +51,7 @@
   },
   "dependencies": {
     "@point-hub/express-cli": "^0.2.2",
-    "@point-hub/express-error-handler": "^0.0.6",
+    "@point-hub/express-error-handler": "^0.1.3",
     "@point-hub/express-utils": "^0.1.1",
     "shelljs": "^0.8.5"
   },

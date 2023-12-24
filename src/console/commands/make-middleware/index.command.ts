@@ -3,7 +3,7 @@ import { kebabCase, pascalCase } from '@point-hub/express-utils'
 import fs from 'fs'
 import path from 'path'
 
-import { stubDir } from '@/index'
+import { stubDir } from '../../../index'
 
 export default class MakeMiddleware extends BaseCommand {
   constructor() {

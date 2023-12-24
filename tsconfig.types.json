@@ -1,11 +1,8 @@
 {
   "include": [
-    "build.ts",
-    "cli.ts",
     "src/**/*",
     "stub/**/*",
     "package.json",
-    "root.ts"
   ],
   "compilerOptions": {
     "lib": ["ESNext"],
@@ -14,15 +11,17 @@
     "moduleResolution": "bundler",
     "moduleDetection": "force",
     "allowImportingTsExtensions": true,
-    "noEmit": true,
+    "noEmit": false,
+    "emitDeclarationOnly": true,
+    "declaration": true,
+    "declarationDir": "lib",
+    "declarationMap": true,
     "composite": true,
     "strict": true,
     "downlevelIteration": true,
     "skipLibCheck": true,
-    "jsx": "react-jsx",
     "allowSyntheticDefaultImports": true,
     "forceConsistentCasingInFileNames": true,
-    "allowJs": true,
     "types": [
       "bun-types" // add Bun global
     ],

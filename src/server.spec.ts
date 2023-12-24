@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'bun:test'
 
-import { createApp } from '@/app'
-import { BaseServer as Server } from '@/index'
+import { createApp } from './app'
+import { BaseServer as Server } from './index'
 
 const port = 3001
 
