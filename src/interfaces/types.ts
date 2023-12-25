@@ -1,5 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-// controller
+/**
+ * Controller
+ */
 export interface IHttpRequest {
   [key: string]: any
 }
@@ -17,12 +19,63 @@ export interface IControllerOutput {
   status: number
   json?: any
 }
-// use case
+/**
+ * UseCase
+ */
 export interface IUseCase<TInput, TDeps, TOptions, TOutput> {
   handle(input: TInput, deps: TDeps, options?: TOptions): Promise<TOutput>
 }
-// database
-/* eslint-disable @typescript-eslint/no-explicit-any */
+/**
+ * Repository
+ */
+export interface IAggregateRepository {
+  collection: string
+  handle(pipeline: IPipeline, query: IQuery, options?: unknown): Promise<IAggregateOutput>
+}
+
+export interface ICreateManyRepository {
+  collection: string
+  handle(documents: IDocument[], options?: unknown): Promise<ICreateManyOutput>
+}
+
+export interface ICreateRepository {
+  collection: string
+  handle(document: IDocument, options?: unknown): Promise<ICreateOutput>
+}
+
+export interface IDeleteManyRepository {
+  collection: string
+  handle(_ids: string[], options?: unknown): Promise<IDeleteManyOutput>
+}
+
+export interface IDeleteRepository {
+  collection: string
+  handle(_id: string, options?: unknown): Promise<IDeleteOutput>
+}
+
+export interface IRetrieveAllRepository {
+  collection: string
+  handle(query: IQuery, options?: unknown): Promise<IRetrieveAllOutput>
+}
+
+export interface IRetrieveRepository {
+  collection: string
+  handle(_id: string, options?: unknown): Promise<IRetrieveOutput>
+}
+
+export interface IUpdateManyRepository {
+  collection: string
+  handle(filter: IDocument, document: IDocument, options?: unknown): Promise<IUpdateManyOutput>
+}
+
+export interface IUpdateRepository {
+  collection: string
+  handle(_id: string, document: IDocument, options?: unknown): Promise<IUpdateOutput>
+}
+
+/**
+ * Database
+ */
 export interface IDocument {
   [key: string]: any
 }
@@ -125,4 +178,33 @@ export interface IDatabase {
   deleteMany(_ids: string[], options?: unknown): Promise<IDeleteManyOutput>
   deleteAll(options?: unknown): Promise<IDeleteManyOutput>
   aggregate(pipeline: IPipeline, query: IQuery, options?: unknown): Promise<IAggregateOutput>
+}
+/**
+ * Express App
+ */
+export interface IAppInput {
+  dbConnection: IDatabase
+}
+/**
+ * Router
+ */
+export interface IBaseRouterInput {
+  dbConnection: IDatabase
+}
+/**
+ * Schema Validation
+ */
+export interface ISchemaValidation {
+  (document: IDocument, schema: IDocument): Promise<void>
+}
+/**
+ * Config
+ */
+export interface IServerConfig {
+  port: number
+  host: string
+}
+export interface IMongoDBConfig {
+  url: string
+  name: string
 }
