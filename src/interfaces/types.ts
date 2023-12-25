@@ -159,7 +159,7 @@ export interface IDatabase {
   database(name: string, options?: unknown): this
   collection(name: string, options?: unknown): this
   listCollections(): Promise<{ name: string }[]>
-  startSession(): IClientSession
+  startSession(): unknown
   endSession(): Promise<void>
   startTransaction(): void
   commitTransaction(): Promise<void>

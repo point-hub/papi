@@ -24,6 +24,7 @@ export { ExpressCli as BaseConsoleCli } from '@point-hub/express-cli'
 export const BaseConsoleCommand = BaseCommand
 export const BaseConsoleKernel = ConsoleKernel
 // Database
+export { DatabaseTestUtil } from './test/utils'
 export const BaseDatabaseConnection = DatabaseConnection
 export const BaseMongoDBConnection = MongoDBConnection
 export const BaseMongoDBHelper = MongoDBHelper
