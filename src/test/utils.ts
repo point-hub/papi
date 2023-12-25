@@ -1,52 +1,47 @@
-import { fileSearch } from '@point-hub/express-utils'
-import { MongoMemoryReplSet } from 'mongodb-memory-server'
-
 import type { IDatabase, IQuery } from '../index'
 import { BaseMongoDBConnection, BaseMongoDBHelper, BaseMongoDBQuerystring } from '../index'
-
-const mongodbServer = await MongoMemoryReplSet.create({ replSet: { count: 3 } })
-const uri = mongodbServer.getUri()
+import { ISchema } from '../index'
 
 export class DatabaseTestUtil {
   public static dbConnection: IDatabase
 
-  static async open() {
-    DatabaseTestUtil.dbConnection = new BaseMongoDBConnection(uri, 'api_test')
+  static async open(uri: string, name = 'api_test') {
+    DatabaseTestUtil.dbConnection = new BaseMongoDBConnection(uri, name)
     await DatabaseTestUtil.dbConnection.open()
   }
 
   static async close() {
     await DatabaseTestUtil.dbConnection.close()
-    await mongodbServer.stop()
   }
 
-  static async createCollections() {
+  static async createCollections(listSchema: ISchema[][]) {
     const helper = new BaseMongoDBHelper(DatabaseTestUtil.dbConnection)
-    const object = await fileSearch('schema.ts', './src/modules', { maxDeep: 2, regExp: true })
-    for (const property in object) {
-      const path = `../modules/${object[property].path.replace('\\', '/')}`
-      const { schema } = await import(path)
-      for (const iterator of schema) {
-        if (!(await helper.isExists(iterator.collection))) {
-          console.info(`[schema] ${iterator.collection} - create collection`)
-          await DatabaseTestUtil.dbConnection.createCollection(iterator.collection)
+
+    for (let i = 0; i < listSchema.length; i++) {
+      for (let j = 0; j < listSchema[i].length; j++) {
+        if (!(await helper.isExists(listSchema[i][j].collection))) {
+          console.info(`[schema] ${listSchema[i][j].collection} - create collection`)
+          await DatabaseTestUtil.dbConnection.createCollection(listSchema[i][j].collection)
         }
 
-        console.info(`[schema] ${iterator.collection} - update schema`)
-        await DatabaseTestUtil.dbConnection.updateSchema(iterator.collection, iterator.schema)
+        console.info(`[schema] ${listSchema[i][j].collection} - update schema`)
+        await DatabaseTestUtil.dbConnection.updateSchema(listSchema[i][j].collection, listSchema[i][j].schema)
 
-        for (const unique of iterator.unique) {
+        for (const unique of listSchema[i][j].unique) {
           if (unique.length) {
-            console.info(`[schema] ${iterator.collection} - create unique attribute "name"`)
-            await helper.createUnique(iterator.collection, BaseMongoDBQuerystring.convertArrayToObject(unique, -1))
+            console.info(`[schema] ${listSchema[i][j].collection} - create unique attribute "name"`)
+            await helper.createUnique(
+              listSchema[i][j].collection,
+              BaseMongoDBQuerystring.convertArrayToObject(unique, -1),
+            )
           }
         }
 
-        for (const unique of iterator.uniqueIfExists) {
+        for (const unique of listSchema[i][j].uniqueIfExists) {
           if (unique.length) {
-            console.info(`[schema] ${iterator.collection} - create unique attribute "name"`)
+            console.info(`[schema] ${listSchema[i][j].collection} - create unique attribute "name"`)
             await helper.createUniqueIfNotNull(
-              iterator.collection,
+              listSchema[i][j].collection,
               BaseMongoDBQuerystring.convertArrayToObject(unique, -1),
             )
           }

@@ -76,6 +76,14 @@ export interface IUpdateRepository {
 /**
  * Database
  */
+export interface ISchema {
+  collection: string
+  required: string[]
+  unique: string[][]
+  uniqueIfExists: never[][]
+  schema: Record<string, any>
+}
+
 export interface IDocument {
   [key: string]: any
 }
