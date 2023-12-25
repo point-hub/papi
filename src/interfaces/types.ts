@@ -185,6 +185,10 @@ export interface IDatabase {
 export interface IAppInput {
   dbConnection: IDatabase
 }
+export interface IMakeControllerInput {
+  controller: IController
+  dbConnection: IDatabase
+}
 /**
  * Router
  */

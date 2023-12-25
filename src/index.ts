@@ -29,6 +29,8 @@ export const BaseMongoDBHelper = MongoDBHelper
 export const BaseMongoDBQuerystring = Querystring
 export const BaseMongoServerError = MongoServerError
 export const BaseMongoErrorHandler = MongoErrorHandler
+// Factory
+export { default as BaseFactory } from '@point-hub/express-factory'
 // Error Handler
 export const BaseErrorHandler = {
   ApiError,
@@ -61,6 +63,7 @@ export type {
   IDeleteRepository,
   IDocument,
   IHttpRequest,
+  IMakeControllerInput,
   IMongoDBConfig,
   IPipeline,
   IQuery,
