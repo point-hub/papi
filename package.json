@@ -1,6 +1,6 @@
 {
   "name": "@point-hub/papi",
-  "version": "0.1.16",
+  "version": "0.1.17",
   "description": "Point API Framework",
   "type": "module",
   "main": "lib/index.js",
@@ -54,8 +54,7 @@
     "@point-hub/express-error-handler": "^0.1.3",
     "@point-hub/express-factory": "^1.1.4",
     "@point-hub/express-utils": "^0.1.1",
-    "shelljs": "^0.8.5",
-    "validatorjs": "^3.22.1"
+    "shelljs": "^0.8.5"
   },
   "peerDependencies": {
     "express": "^4.18.1"
