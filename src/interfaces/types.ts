@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { ClientSession } from 'mongodb'
 /**
  * Controller
  */
@@ -153,12 +154,8 @@ export interface IAggregateOutput {
   }
 }
 
-export interface IClientSession {
-  startTransaction(options?: unknown): void
-  commitTransaction(): Promise<void>
-  abortTransaction(): Promise<void>
-  endSession(): Promise<void>
-}
+// Todo: declare own client session
+export interface IClientSession extends ClientSession {}
 
 export interface IDatabase {
   session: unknown
@@ -167,7 +164,7 @@ export interface IDatabase {
   database(name: string, options?: unknown): this
   collection(name: string, options?: unknown): this
   listCollections(): Promise<{ name: string }[]>
-  startSession(): unknown
+  startSession(): ClientSession
   endSession(): Promise<void>
   startTransaction(): void
   commitTransaction(): Promise<void>
