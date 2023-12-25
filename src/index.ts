@@ -15,6 +15,7 @@ import { MongoDBConnection } from './database/mongodb/connection'
 import { MongoErrorHandler } from './database/mongodb/mongodb-error-handler'
 import { MongoDBHelper } from './database/mongodb/mongodb-helper'
 import Querystring from './database/mongodb/mongodb-querystring'
+import mongodbErrorHandlerMiddleware from './middleware/mongodb-error-handler.middleware'
 
 export const stubDir = import.meta.path.replace('/index.ts', '/../stub').replace('/index.js', '/../stub')
 
@@ -37,6 +38,7 @@ export const BaseErrorHandler = {
   BaseError,
   isTrustedError,
   getHttpError: find,
+  mongodbErrorHandlerMiddleware: mongodbErrorHandlerMiddleware,
   errorHandlerMiddleware,
   invalidPathMiddleware,
 }
