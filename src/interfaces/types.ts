@@ -1,9 +1,33 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-interface IDocument {
+// controller
+export interface IHttpRequest {
   [key: string]: any
 }
 
-interface IQuery {
+export interface IControllerInput {
+  httpRequest: IHttpRequest
+  dbConnection: IDatabase
+}
+
+export interface IController {
+  (input: IControllerInput): Promise<IControllerOutput>
+}
+
+export interface IControllerOutput {
+  status: number
+  json?: any
+}
+// use case
+export interface IUseCase<TInput, TDeps, TOptions, TOutput> {
+  handle(input: TInput, deps: TDeps, options?: TOptions): Promise<TOutput>
+}
+// database
+/* eslint-disable @typescript-eslint/no-explicit-any */
+export interface IDocument {
+  [key: string]: any
+}
+
+export interface IQuery {
   fields?: string
   excludeFields?: string[]
   filter?: { [key: string]: unknown }
@@ -12,25 +36,25 @@ interface IQuery {
   sort?: string
 }
 
-interface IPipeline {
+export interface IPipeline {
   [key: string]: any
 }
 
-interface ICreateOutput {
+export interface ICreateOutput {
   insertedId: string
 }
 
-interface ICreateManyOutput {
+export interface ICreateManyOutput {
   insertedCount: number
   insertedIds: string[]
 }
 
-interface IRetrieveOutput {
+export interface IRetrieveOutput {
   _id: string
   [key: string]: unknown
 }
 
-interface IRetrieveAllOutput {
+export interface IRetrieveAllOutput {
   data: IRetrieveOutput[]
   pagination: {
     page: number
@@ -40,25 +64,25 @@ interface IRetrieveAllOutput {
   }
 }
 
-interface IUpdateOutput {
+export interface IUpdateOutput {
   matchedCount: number
   modifiedCount: number
 }
 
-interface IUpdateManyOutput {
+export interface IUpdateManyOutput {
   matchedCount: number
   modifiedCount: number
 }
 
-interface IDeleteOutput {
+export interface IDeleteOutput {
   deletedCount: number
 }
 
-interface IDeleteManyOutput {
+export interface IDeleteManyOutput {
   deletedCount: number
 }
 
-interface IAggregateOutput {
+export interface IAggregateOutput {
   data: IRetrieveOutput[]
   pagination: {
     page: number
@@ -68,14 +92,14 @@ interface IAggregateOutput {
   }
 }
 
-interface IClientSession {
+export interface IClientSession {
   startTransaction(options?: unknown): void
   commitTransaction(): Promise<void>
   abortTransaction(): Promise<void>
   endSession(): Promise<void>
 }
 
-interface IDatabase {
+export interface IDatabase {
   session: unknown
   open(): Promise<void>
   close(): Promise<void>

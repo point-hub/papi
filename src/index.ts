@@ -40,3 +40,25 @@ export const BaseErrorHandler = {
 }
 // Server
 export { Server as BaseServer } from './server'
+// Types
+export type {
+  IAggregateOutput,
+  IClientSession,
+  IController,
+  IControllerInput,
+  IControllerOutput,
+  ICreateManyOutput,
+  ICreateOutput,
+  IDatabase,
+  IDeleteManyOutput,
+  IDeleteOutput,
+  IDocument,
+  IHttpRequest,
+  IPipeline,
+  IQuery,
+  IRetrieveAllOutput,
+  IRetrieveOutput,
+  IUpdateManyOutput,
+  IUpdateOutput,
+  IUseCase,
+} from './interfaces/types'

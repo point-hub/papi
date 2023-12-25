@@ -17,6 +17,21 @@ import type {
 } from 'mongodb'
 import { MongoClient, ObjectId } from 'mongodb'
 
+import {
+  IAggregateOutput,
+  ICreateManyOutput,
+  ICreateOutput,
+  IDatabase,
+  IDeleteManyOutput,
+  IDeleteOutput,
+  IDocument,
+  IPipeline,
+  IQuery,
+  IRetrieveAllOutput,
+  IRetrieveOutput,
+  IUpdateManyOutput,
+  IUpdateOutput,
+} from '../../index'
 import { MongoDBHelper } from './mongodb-helper'
 import Querystring from './mongodb-querystring'
 

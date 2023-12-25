@@ -1,3 +1,19 @@
+import {
+  IAggregateOutput,
+  ICreateManyOutput,
+  ICreateOutput,
+  IDatabase,
+  IDeleteManyOutput,
+  IDeleteOutput,
+  IDocument,
+  IPipeline,
+  IQuery,
+  IRetrieveAllOutput,
+  IRetrieveOutput,
+  IUpdateManyOutput,
+  IUpdateOutput,
+} from '../index'
+
 export class DatabaseConnection implements IDatabase {
   session: unknown
   constructor(public adapter: IDatabase) {}

@@ -1,6 +1,8 @@
 import { isValid } from 'date-fns'
 import { ObjectId } from 'mongodb'
 
+import { IDatabase } from '../../index'
+
 /**
  * https://www.mongodb.com/docs/drivers/node/current/fundamentals/indexes/
  * https://www.mongodb.com/docs/manual/reference/collation/
