@@ -31,6 +31,8 @@ export const BaseMongoDBHelper = MongoDBHelper
 export const BaseMongoDBQuerystring = Querystring
 export const BaseMongoServerError = MongoServerError
 export const BaseMongoErrorHandler = MongoErrorHandler
+// Validation
+export { schemaValidation } from './validation'
 // Factory
 export { default as BaseFactory } from '@point-hub/express-factory'
 // Error Handler
