@@ -6,6 +6,7 @@ import {
   find,
   invalidPathMiddleware,
   isTrustedError,
+  type TypeCodeStatus,
 } from '@point-hub/express-error-handler'
 import { MongoServerError } from 'mongodb'
 
@@ -39,13 +40,14 @@ export const BaseErrorHandler = {
   BaseError,
   isTrustedError,
   getHttpError: find,
-  mongodbErrorHandlerMiddleware: mongodbErrorHandlerMiddleware,
+  mongodbErrorHandlerMiddleware,
   errorHandlerMiddleware,
   invalidPathMiddleware,
 }
 // Server
 export { Server as BaseServer } from './server'
 // Types
+export type { TypeCodeStatus }
 export type {
   IAggregateOutput,
   IAggregateRepository,
