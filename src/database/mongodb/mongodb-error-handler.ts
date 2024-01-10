@@ -45,7 +45,7 @@ export function handleUniqueValidation(err: MongoServerError, error: IError) {
 
 export class MongoErrorHandler extends BaseError {
   constructor(err: MongoServerError) {
-    const error: IError = find(400) as IHttpStatus
+    const error: IError = find(422) as IHttpStatus
     if (err.code === 121) {
       handleSchemaValidation(err, error)
     } else if (err.code === 11000) {
