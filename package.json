@@ -1,6 +1,6 @@
 {
   "name": "@point-hub/papi",
-  "version": "0.1.19",
+  "version": "0.1.20",
   "description": "Point API Framework",
   "type": "module",
   "main": "lib/index.js",
@@ -13,7 +13,7 @@
     "check-types": "tsc -p tsconfig.json",
     "dev": "shx rm -rf lib && bun run build.ts --watch",
     "build": "shx rm -rf lib && bun run check-types && bun run build.ts && bun run build:declaration",
-    "build:declaration": "shx rm tsconfig.types.tsbuildinfo && tsc -p tsconfig.types.json",
+    "build:declaration": "shx rm -rf tsconfig.types.tsbuildinfo && tsc -p tsconfig.types.json",
     "lint": "eslint ./src/**/*.ts",
     "lint:fix": "bun run lint -- --fix"
   },
