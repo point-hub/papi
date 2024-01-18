@@ -91,10 +91,10 @@ export interface IDocument {
 
 export interface IQuery {
   fields?: string
-  excludeFields?: string[]
+  exclude_fields?: string[]
   filter?: { [key: string]: unknown }
   page?: number
-  pageSize?: number
+  page_size?: number
   sort?: string
 }
 
@@ -103,13 +103,13 @@ export interface IPipeline {
 }
 
 export interface ICreateOutput {
-  insertedId: string
+  inserted_id: string
   [key: string]: unknown
 }
 
 export interface ICreateManyOutput {
-  insertedCount: number
-  insertedIds: string[]
+  inserted_count: number
+  inserted_ids: string[]
   [key: string]: unknown
 }
 
@@ -122,32 +122,32 @@ export interface IRetrieveAllOutput {
   data: IRetrieveOutput[]
   pagination: {
     page: number
-    pageCount: number
-    pageSize: number
-    totalDocument: number
+    page_count: number
+    page_size: number
+    total_document: number
   }
   [key: string]: unknown
 }
 
 export interface IUpdateOutput {
-  matchedCount: number
-  modifiedCount: number
+  matched_count: number
+  modified_count: number
   [key: string]: unknown
 }
 
 export interface IUpdateManyOutput {
-  matchedCount: number
-  modifiedCount: number
+  matched_count: number
+  modified_count: number
   [key: string]: unknown
 }
 
 export interface IDeleteOutput {
-  deletedCount: number
+  deleted_count: number
   [key: string]: unknown
 }
 
 export interface IDeleteManyOutput {
-  deletedCount: number
+  deleted_count: number
   [key: string]: unknown
 }
 
@@ -155,9 +155,9 @@ export interface IAggregateOutput {
   data: IRetrieveOutput[]
   pagination: {
     page: number
-    pageCount: number
-    pageSize: number
-    totalDocument: number
+    page_count: number
+    page_size: number
+    total_document: number
   }
   [key: string]: unknown
 }

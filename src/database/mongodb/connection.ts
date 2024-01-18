@@ -149,7 +149,7 @@ export class MongoDBConnection implements IDatabase {
     const response = await this._collection.insertOne(document, createOptions)
 
     return {
-      insertedId: response.insertedId.toString(),
+      inserted_id: response.insertedId.toString(),
     }
   }
 
@@ -169,8 +169,8 @@ export class MongoDBConnection implements IDatabase {
     })
 
     return {
-      insertedIds: insertedIds,
-      insertedCount: response.insertedCount,
+      inserted_ids: insertedIds,
+      inserted_count: response.insertedCount,
     }
   }
 
@@ -183,15 +183,15 @@ export class MongoDBConnection implements IDatabase {
 
     const cursor = this._collection
       .find(MongoDBHelper.stringToObjectId(query.filter ?? {}), retrieveOptions)
-      .limit(Querystring.limit(query.pageSize))
-      .skip(Querystring.skip(Querystring.page(query.page), Querystring.limit(query.pageSize)))
+      .limit(Querystring.limit(query.page_size))
+      .skip(Querystring.skip(Querystring.page(query.page), Querystring.limit(query.page_size)))
 
     if (query.sort && Querystring.sort(query.sort)) {
       cursor.sort(Querystring.sort(query.sort))
     }
 
-    if (Querystring.fields(query.fields, query.excludeFields)) {
-      cursor.project(Querystring.fields(query.fields, query.excludeFields))
+    if (Querystring.fields(query.fields, query.exclude_fields)) {
+      cursor.project(Querystring.fields(query.fields, query.exclude_fields))
     }
     const result = await cursor.toArray()
 
@@ -201,9 +201,9 @@ export class MongoDBConnection implements IDatabase {
       data: MongoDBHelper.objectIdToString(result) as unknown[] as IRetrieveOutput[],
       pagination: {
         page: Querystring.page(query.page),
-        pageCount: Math.ceil(totalDocument / Querystring.limit(query.pageSize)),
-        pageSize: Querystring.limit(query.pageSize),
-        totalDocument,
+        page_count: Math.ceil(totalDocument / Querystring.limit(query.page_size)),
+        page_size: Querystring.limit(query.page_size),
+        total_document: totalDocument,
       },
     }
   }
@@ -239,8 +239,8 @@ export class MongoDBConnection implements IDatabase {
     )
 
     return {
-      modifiedCount: result.modifiedCount,
-      matchedCount: result.matchedCount,
+      modified_count: result.modifiedCount,
+      matched_count: result.matchedCount,
     }
   }
 
@@ -258,8 +258,8 @@ export class MongoDBConnection implements IDatabase {
     )
 
     return {
-      matchedCount: result.matchedCount,
-      modifiedCount: result.modifiedCount,
+      matched_count: result.matchedCount,
+      modified_count: result.modifiedCount,
     }
   }
 
@@ -277,7 +277,7 @@ export class MongoDBConnection implements IDatabase {
       deleteOptions,
     )
 
-    return { deletedCount: result.deletedCount }
+    return { deleted_count: result.deletedCount }
   }
 
   public async deleteMany(_ids: string[], options?: any): Promise<IDeleteManyOutput> {
@@ -296,7 +296,7 @@ export class MongoDBConnection implements IDatabase {
       deleteOptions,
     )
 
-    return { deletedCount: result.deletedCount }
+    return { deleted_count: result.deletedCount }
   }
 
   public async deleteAll(options?: any): Promise<IDeleteManyOutput> {
@@ -308,7 +308,7 @@ export class MongoDBConnection implements IDatabase {
 
     const result = await this._collection.deleteMany({}, deleteOptions)
 
-    return { deletedCount: result.deletedCount }
+    return { deleted_count: result.deletedCount }
   }
 
   public async aggregate(pipeline: IPipeline[], query: IQuery, options?: any): Promise<IAggregateOutput> {
@@ -321,8 +321,8 @@ export class MongoDBConnection implements IDatabase {
     const cursor = this._collection.aggregate(
       [
         ...pipeline,
-        { $skip: (Querystring.page(query.page) - 1) * Querystring.limit(query.pageSize) },
-        { $limit: Querystring.limit(query.pageSize) },
+        { $skip: (Querystring.page(query.page) - 1) * Querystring.limit(query.page_size) },
+        { $limit: Querystring.limit(query.page_size) },
       ],
       aggregateOptions,
     )
@@ -331,8 +331,8 @@ export class MongoDBConnection implements IDatabase {
       cursor.sort(Querystring.sort(query.sort))
     }
 
-    if (Querystring.fields(query.fields, query.excludeFields)) {
-      cursor.project(Querystring.fields(query.fields, query.excludeFields))
+    if (Querystring.fields(query.fields, query.exclude_fields)) {
+      cursor.project(Querystring.fields(query.fields, query.exclude_fields))
     }
 
     const result = await cursor.toArray()
@@ -345,9 +345,9 @@ export class MongoDBConnection implements IDatabase {
       data: MongoDBHelper.objectIdToString(result) as IRetrieveOutput[],
       pagination: {
         page: Querystring.page(query.page),
-        pageCount: Math.ceil(totalDocument / Querystring.limit(query.pageSize)),
-        pageSize: Querystring.limit(query.pageSize),
-        totalDocument,
+        page_count: Math.ceil(totalDocument / Querystring.limit(query.page_size)),
+        page_size: Querystring.limit(query.page_size),
+        total_document: totalDocument,
       },
     }
   }

@@ -3,7 +3,7 @@ import { describe, expect, it } from 'bun:test'
 import { createApp } from './app'
 import { BaseServer as Server } from './index'
 
-const port = 3001
+const port = 4000
 
 describe('server', () => {
   it('server should start on http://localhost:port', async () => {
