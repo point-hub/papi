@@ -104,11 +104,13 @@ export interface IPipeline {
 
 export interface ICreateOutput {
   insertedId: string
+  [key: string]: unknown
 }
 
 export interface ICreateManyOutput {
   insertedCount: number
   insertedIds: string[]
+  [key: string]: unknown
 }
 
 export interface IRetrieveOutput {
@@ -124,24 +126,29 @@ export interface IRetrieveAllOutput {
     pageSize: number
     totalDocument: number
   }
+  [key: string]: unknown
 }
 
 export interface IUpdateOutput {
   matchedCount: number
   modifiedCount: number
+  [key: string]: unknown
 }
 
 export interface IUpdateManyOutput {
   matchedCount: number
   modifiedCount: number
+  [key: string]: unknown
 }
 
 export interface IDeleteOutput {
   deletedCount: number
+  [key: string]: unknown
 }
 
 export interface IDeleteManyOutput {
   deletedCount: number
+  [key: string]: unknown
 }
 
 export interface IAggregateOutput {
@@ -152,6 +159,7 @@ export interface IAggregateOutput {
     pageSize: number
     totalDocument: number
   }
+  [key: string]: unknown
 }
 
 // Todo: declare own client session
