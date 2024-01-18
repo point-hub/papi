@@ -1,7 +1,7 @@
 await Bun.build({
   entrypoints: ['./src/index.ts'],
-  splitting: true,
-  minify: true,
+  splitting: false,
+  minify: false,
   target: 'bun',
   outdir: './lib',
 })
