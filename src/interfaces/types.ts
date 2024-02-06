@@ -18,6 +18,7 @@ export interface IController {
 
 export interface IControllerOutput {
   status: number
+  cookies?: any
   json?: any
 }
 /**
