@@ -93,7 +93,7 @@ export interface IDocument {
 export interface IQuery {
   fields?: string
   exclude_fields?: string[]
-  filter?: { [key: string]: unknown }
+  filter?: { [key: string]: any }
   page?: number
   page_size?: number
   sort?: string
