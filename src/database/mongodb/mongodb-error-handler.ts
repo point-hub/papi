@@ -50,6 +50,8 @@ export class MongoErrorHandler extends BaseError {
       handleSchemaValidation(err, error)
     } else if (err.code === 11000) {
       handleUniqueValidation(err, error)
+    } else {
+      console.error(err)
     }
     super(error)
     Object.setPrototypeOf(this, new.target.prototype)
