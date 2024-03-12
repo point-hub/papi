@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { isEmpty } from '@point-hub/express-utils'
 import type {
   AggregateOptions,
   BulkWriteOptions,
@@ -178,7 +179,6 @@ export class MongoDBConnection implements IDatabase {
     if (!this._collection) {
       throw new Error('Collection not found')
     }
-
     const retrieveOptions = options as FindOptions
 
     const cursor = this._collection
@@ -186,12 +186,13 @@ export class MongoDBConnection implements IDatabase {
       .limit(Querystring.limit(query.page_size))
       .skip(Querystring.skip(Querystring.page(query.page), Querystring.limit(query.page_size)))
 
-    if (query.sort && Querystring.sort(query.sort)) {
-      cursor.sort(Querystring.sort(query.sort))
+    const sort = Querystring.sort(query.sort ?? '')
+    if (!isEmpty(sort)) {
+      cursor.sort(sort)
     }
-
-    if (Querystring.fields(query.fields, query.exclude_fields)) {
-      cursor.project(Querystring.fields(query.fields, query.exclude_fields))
+    const fields = Querystring.fields(query.fields ?? '', query.exclude_fields ?? [])
+    if (!isEmpty(fields)) {
+      cursor.project(fields)
     }
     const result = await cursor.toArray()
 
@@ -326,13 +327,13 @@ export class MongoDBConnection implements IDatabase {
       ],
       aggregateOptions,
     )
-
-    if (query.sort && Querystring.sort(query.sort)) {
-      cursor.sort(Querystring.sort(query.sort))
+    const sort = Querystring.sort(query.sort ?? '')
+    if (!isEmpty(sort)) {
+      cursor.sort(sort)
     }
-
-    if (Querystring.fields(query.fields, query.exclude_fields)) {
-      cursor.project(Querystring.fields(query.fields, query.exclude_fields))
+    const fields = Querystring.fields(query.fields ?? '', query.exclude_fields ?? [])
+    if (!isEmpty(fields)) {
+      cursor.project(fields)
     }
 
     const result = await cursor.toArray()
