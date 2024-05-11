@@ -1,6 +1,6 @@
 {
   "name": "@point-hub/papi",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "description": "Point API Framework",
   "type": "module",
   "main": "lib/index.js",
@@ -53,7 +53,7 @@
   },
   "dependencies": {
     "@point-hub/express-cli": "^0.2.2",
-    "@point-hub/express-error-handler": "^0.2.1",
+    "@point-hub/express-error-handler": "^0.2.2",
     "@point-hub/express-factory": "^1.1.4",
     "@point-hub/express-utils": "^0.2.5",
     "date-fns": "^3.6.0",
