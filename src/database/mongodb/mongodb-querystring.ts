@@ -50,7 +50,8 @@ export function skip(currentPage: string | number, pageSize: string | number): n
   return (page(currentPage) - 1) * limit(pageSize)
 }
 
-export function filter(filter: never) {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function filter(filter: any) {
   return filter
 }
 

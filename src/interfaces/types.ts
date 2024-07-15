@@ -82,7 +82,7 @@ export interface ISchema {
   collection: string
   required: string[]
   unique: string[][]
-  uniqueIfExists: never[][]
+  uniqueIfExists: string[][]
   schema: Record<string, any>
 }
 
