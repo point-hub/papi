@@ -147,7 +147,7 @@ export class MongoDBConnection implements IDatabase {
 
     const createOptions = options as InsertOneOptions
 
-    const response = await this._collection.insertOne(document, createOptions)
+    const response = await this._collection.insertOne(MongoDBHelper.stringToObjectId(document), createOptions)
 
     return {
       inserted_id: response.insertedId.toString(),
@@ -161,7 +161,7 @@ export class MongoDBConnection implements IDatabase {
 
     const createManyOptions = options as BulkWriteOptions
 
-    const response = await this._collection.insertMany(documents, createManyOptions)
+    const response = await this._collection.insertMany(MongoDBHelper.stringToObjectId(documents), createManyOptions)
 
     // convert array of object to array of string
     const insertedIds: string[] = []
