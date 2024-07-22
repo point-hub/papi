@@ -312,44 +312,17 @@ export class MongoDBConnection implements IDatabase {
     return { deleted_count: result.deletedCount }
   }
 
-  public async aggregate(pipeline: IPipeline[], query: IQuery, options?: any): Promise<IAggregateOutput> {
+  public async aggregate(pipeline: IPipeline[], options?: any): Promise<IAggregateOutput> {
     if (!this._collection) {
       throw new Error('Collection not found')
     }
 
     const aggregateOptions = options as AggregateOptions
 
-    const cursor = this._collection.aggregate(
-      [
-        ...pipeline,
-        { $skip: (Querystring.page(query.page) - 1) * Querystring.limit(query.page_size) },
-        { $limit: Querystring.limit(query.page_size) },
-      ],
-      aggregateOptions,
-    )
-    const sort = Querystring.sort(query.sort ?? '')
-    if (!isEmpty(sort)) {
-      cursor.sort(sort)
-    }
-    const fields = Querystring.fields(query.fields ?? '', query.exclude_fields ?? [])
-    if (!isEmpty(fields)) {
-      cursor.project(fields)
-    }
+    const cursor = this._collection.aggregate(pipeline, aggregateOptions)
 
     const result = await cursor.toArray()
 
-    const cursorPagination = this._collection.aggregate([...pipeline, { $count: 'totalDocument' }], aggregateOptions)
-    const resultPagination = await cursorPagination.toArray()
-
-    const totalDocument = resultPagination.length ? resultPagination[0].totalDocument : 0
-    return {
-      data: MongoDBHelper.objectIdToString(result) as IRetrieveOutput[],
-      pagination: {
-        page: Querystring.page(query.page),
-        page_count: Math.ceil(totalDocument / Querystring.limit(query.page_size)),
-        page_size: Querystring.limit(query.page_size),
-        total_document: totalDocument,
-      },
-    }
+    return MongoDBHelper.objectIdToString(result)
   }
 }

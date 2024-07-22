@@ -88,7 +88,7 @@ export class DatabaseConnection implements IDatabase {
   public async deleteAll(options?: unknown): Promise<IDeleteManyOutput> {
     return await this.adapter.deleteAll(options)
   }
-  public async aggregate(pipeline: IPipeline[], query: IQuery, options?: unknown): Promise<IAggregateOutput> {
-    return await this.adapter.aggregate(pipeline, query, options)
+  public async aggregate(pipeline: IPipeline[], options?: unknown): Promise<IAggregateOutput> {
+    return await this.adapter.aggregate(pipeline, options)
   }
 }
