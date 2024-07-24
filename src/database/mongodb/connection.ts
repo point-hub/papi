@@ -319,7 +319,7 @@ export class MongoDBConnection implements IDatabase {
 
     const aggregateOptions = options as AggregateOptions
 
-    const cursor = this._collection.aggregate(pipeline, aggregateOptions)
+    const cursor = this._collection.aggregate(MongoDBHelper.stringToObjectId(pipeline), aggregateOptions)
 
     const result = await cursor.toArray()
 
