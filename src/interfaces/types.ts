@@ -153,6 +153,13 @@ export interface IDeleteManyOutput {
 }
 
 export interface IAggregateOutput {
+  data: IDocument[]
+  pagination: {
+    page: number
+    page_count: number
+    page_size: number
+    total_document: number
+  }
   [key: string]: unknown
 }
 
@@ -184,7 +191,7 @@ export interface IDatabase {
   delete(_id: string, options?: unknown): Promise<IDeleteOutput>
   deleteMany(_ids: string[], options?: unknown): Promise<IDeleteManyOutput>
   deleteAll(options?: unknown): Promise<IDeleteManyOutput>
-  aggregate(pipeline?: IPipeline[], options?: unknown): Promise<IAggregateOutput>
+  aggregate(pipeline?: IPipeline[], query?: IQuery, options?: unknown): Promise<IAggregateOutput>
 }
 /**
  * Express App
