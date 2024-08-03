@@ -31,47 +31,38 @@ export interface IUseCase<TInput, TDeps, TOptions, TOutput> {
  * Repository
  */
 export interface IAggregateRepository {
-  collection: string
   handle(filter: IDocument, options?: unknown): Promise<IAggregateOutput>
 }
 
 export interface ICreateManyRepository {
-  collection: string
   handle(documents: IDocument[], options?: unknown): Promise<ICreateManyOutput>
 }
 
 export interface ICreateRepository {
-  collection: string
   handle(document: IDocument, options?: unknown): Promise<ICreateOutput>
 }
 
 export interface IDeleteManyRepository {
-  collection: string
   handle(_ids: string[], options?: unknown): Promise<IDeleteManyOutput>
 }
 
 export interface IDeleteRepository {
-  collection: string
   handle(_id: string, options?: unknown): Promise<IDeleteOutput>
 }
 
 export interface IRetrieveAllRepository {
-  collection: string
   handle(query: IQuery, options?: unknown): Promise<IRetrieveAllOutput>
 }
 
 export interface IRetrieveRepository {
-  collection: string
   handle(_id: string, options?: unknown): Promise<IRetrieveOutput>
 }
 
 export interface IUpdateManyRepository {
-  collection: string
   handle(filter: IDocument, document: IDocument, options?: unknown): Promise<IUpdateManyOutput>
 }
 
 export interface IUpdateRepository {
-  collection: string
   handle(_id: string, document: IDocument, options?: unknown): Promise<IUpdateOutput>
 }
 
@@ -153,7 +144,7 @@ export interface IDeleteManyOutput {
 }
 
 export interface IAggregateOutput {
-  data: IDocument[]
+  data: { [key: string]: unknown }[]
   pagination: {
     page: number
     page_count: number
