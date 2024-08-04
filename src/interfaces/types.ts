@@ -71,7 +71,6 @@ export interface IUpdateRepository {
  */
 export interface ISchema {
   collection: string
-  required: string[]
   unique: string[][]
   uniqueIfExists: string[][]
   schema: Record<string, any>
