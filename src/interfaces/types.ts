@@ -155,6 +155,7 @@ export interface IAggregateOutput {
 }
 
 // Todo: declare own client session
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface IClientSession extends ClientSession {}
 
 export interface IDatabase {
