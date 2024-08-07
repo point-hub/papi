@@ -109,14 +109,16 @@ export interface IRetrieveOutput {
   [key: string]: unknown
 }
 
+export interface IPagination {
+  page: number
+  page_count: number
+  page_size: number
+  total_document: number
+}
+
 export interface IRetrieveAllOutput {
   data: IRetrieveOutput[]
-  pagination: {
-    page: number
-    page_count: number
-    page_size: number
-    total_document: number
-  }
+  pagination: IPagination
   [key: string]: unknown
 }
 
@@ -144,12 +146,7 @@ export interface IDeleteManyOutput {
 
 export interface IAggregateOutput {
   data: { [key: string]: unknown }[]
-  pagination: {
-    page: number
-    page_count: number
-    page_size: number
-    total_document: number
-  }
+  pagination: IPagination
   [key: string]: unknown
 }
 

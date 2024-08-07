@@ -70,6 +70,7 @@ export type {
   IHttpRequest,
   IMakeControllerInput,
   IMongoDBConfig,
+  IPagination,
   IPipeline,
   IQuery,
   IRetrieveAllOutput,
