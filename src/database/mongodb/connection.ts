@@ -318,10 +318,11 @@ export class MongoDBConnection implements IDatabase {
     }
 
     const aggregateOptions = options as AggregateOptions
+    const convertedPipeline = MongoDBHelper.stringToObjectId(pipeline)
 
     const cursor = this._collection.aggregate(
       [
-        ...MongoDBHelper.stringToObjectId(pipeline),
+        ...convertedPipeline,
         { $skip: (Querystring.page(query?.page) - 1) * Querystring.limit(query?.page_size) },
         { $limit: Querystring.limit(query?.page_size) },
       ],
@@ -340,11 +341,9 @@ export class MongoDBConnection implements IDatabase {
 
     const result = await cursor.toArray()
 
-    const cursorPagination = this._collection.aggregate(
-      [...MongoDBHelper.stringToObjectId(pipeline), { $count: 'totalDocument' }],
-      aggregateOptions,
-    )
-    const resultPagination = await cursorPagination.toArray()
+    const resultPagination = await this._collection
+      .aggregate([...convertedPipeline, { $count: 'totalDocument' }], aggregateOptions)
+      .toArray()
 
     const totalDocument = resultPagination.length ? resultPagination[0].totalDocument : 0
 
