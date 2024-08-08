@@ -48,7 +48,7 @@ export class MongoDBConnection implements IDatabase {
   ) {
     const options: MongoClientOptions = {
       writeConcern: { w: 'majority' },
-      readConcern: { level: 'linearizable' },
+      readConcern: { level: 'majority' },
     }
 
     this.client = new MongoClient(connectionString, options)
