@@ -5,10 +5,10 @@ import { MongoServerError } from 'mongodb'
 export function handleSchemaValidation(err: MongoServerError, error: IError) {
   // handle schema validation error
   error.errors = {} as any
-  const errorMessage = err.errInfo?.details.schemaRulesNotSatisfied[0].propertiesNotSatisfied
-  errorMessage.forEach((element: any) => {
+  const errorMessage = err.errInfo?.details.schemaRulesNotSatisfied[0].missingProperties
+  errorMessage.forEach((element: string) => {
     const obj: any = {}
-    obj[element.propertyName] = [element.details[0].reason]
+    obj[element] = [`${element} is required`]
     error.errors = obj
   })
 }
@@ -51,7 +51,7 @@ export class MongoErrorHandler extends BaseError {
     } else if (err.code === 11000) {
       handleUniqueValidation(err, error)
     } else {
-      console.error(err)
+      console.error(JSON.stringify(err))
     }
     super(error)
     Object.setPrototypeOf(this, new.target.prototype)
