@@ -323,40 +323,45 @@ export class MongoDBConnection implements IDatabase {
     const aggregateOptions = options as AggregateOptions
     const convertedPipeline = MongoDBHelper.stringToObjectId(pipeline)
 
-    const cursor = this._collection.aggregate(
-      [
-        ...convertedPipeline,
-        { $skip: (Querystring.page(query?.page) - 1) * Querystring.limit(query?.page_size) },
-        { $limit: Querystring.limit(query?.page_size) },
-      ],
-      aggregateOptions,
-    )
-
     const sort = Querystring.sort(query?.sort ?? '')
     if (!isEmpty(sort)) {
-      cursor.sort(sort)
+      convertedPipeline.push({ $sort: Querystring.sort(query?.sort ?? '') })
     }
 
     const fields = Querystring.fields(query?.fields ?? '', query?.exclude_fields ?? [])
     if (!isEmpty(fields)) {
-      cursor.project(fields)
+      convertedPipeline.push({ $project: Querystring.fields(query?.fields ?? '', query?.exclude_fields ?? []) })
     }
+
+    const cursor = this._collection.aggregate(
+      [
+        ...convertedPipeline,
+        {
+          $facet: {
+            paginated_result: [
+              { $skip: (Querystring.page(query?.page) - 1) * Querystring.limit(query?.page_size) },
+              { $limit: Querystring.limit(query?.page_size) },
+            ],
+            total_document: [
+              {
+                $count: 'total_document',
+              },
+            ],
+          },
+        },
+      ],
+      aggregateOptions,
+    )
 
     const result = await cursor.toArray()
 
-    const resultPagination = await this._collection
-      .aggregate([...convertedPipeline, { $count: 'totalDocument' }], aggregateOptions)
-      .toArray()
-
-    const totalDocument = resultPagination.length ? resultPagination[0].totalDocument : 0
-
     return {
-      data: MongoDBHelper.objectIdToString(result),
+      data: MongoDBHelper.objectIdToString(result[0].paginated_result),
       pagination: {
         page: Querystring.page(query?.page),
-        page_count: Math.ceil(totalDocument / Querystring.limit(query?.page_size)),
+        page_count: Math.ceil(result[0].total_document / Querystring.limit(query?.page_size)),
         page_size: Querystring.limit(query?.page_size),
-        total_document: totalDocument,
+        total_document: result[0].total_document[0].total_document,
       },
     }
   }
