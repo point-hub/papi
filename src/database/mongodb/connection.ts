@@ -332,7 +332,6 @@ export class MongoDBConnection implements IDatabase {
     if (!isEmpty(fields)) {
       convertedPipeline.push({ $project: Querystring.fields(query?.fields ?? '', query?.exclude_fields ?? []) })
     }
-
     const cursor = this._collection.aggregate(
       [
         ...convertedPipeline,
@@ -359,9 +358,9 @@ export class MongoDBConnection implements IDatabase {
       data: MongoDBHelper.objectIdToString(result[0].paginated_result),
       pagination: {
         page: Querystring.page(query?.page),
-        page_count: Math.ceil(result[0].total_document / Querystring.limit(query?.page_size)),
+        page_count: Math.ceil(result[0].total_document[0].total_document / Querystring.limit(query?.page_size)),
         page_size: Querystring.limit(query?.page_size),
-        total_document: result[0].total_document[0].total_document,
+        total_document: result[0]?.total_document[0]?.total_document ?? 0,
       },
     }
   }
