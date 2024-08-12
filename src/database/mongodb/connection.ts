@@ -354,13 +354,15 @@ export class MongoDBConnection implements IDatabase {
 
     const result = await cursor.toArray()
 
+    const totalDocument = result[0]?.total_document[0]?.total_document ?? 0
+
     return {
       data: MongoDBHelper.objectIdToString(result[0].paginated_result),
       pagination: {
         page: Querystring.page(query?.page),
-        page_count: Math.ceil(result[0].total_document[0].total_document / Querystring.limit(query?.page_size)),
+        page_count: totalDocument ? Math.ceil(totalDocument / Querystring.limit(query?.page_size)) : 0,
         page_size: Querystring.limit(query?.page_size),
-        total_document: result[0]?.total_document[0]?.total_document ?? 0,
+        total_document: totalDocument ?? 0,
       },
     }
   }
