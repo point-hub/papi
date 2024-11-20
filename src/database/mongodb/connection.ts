@@ -238,7 +238,7 @@ export class MongoDBConnection implements IDatabase {
 
     const result = await this._collection.updateOne(
       { _id: new ObjectId(_id) },
-      { $set: MongoDBHelper.stringToObjectId(document) },
+      MongoDBHelper.stringToObjectId(document),
       updateOptions,
     )
 
@@ -248,7 +248,7 @@ export class MongoDBConnection implements IDatabase {
     }
   }
 
-  public async updateMany(filter: IDocument[], document: IDocument[], options?: any): Promise<IUpdateManyOutput> {
+  public async updateMany(filter: IDocument, document: IDocument, options?: any): Promise<IUpdateManyOutput> {
     if (!this._collection) {
       throw new Error('Collection not found')
     }
@@ -257,7 +257,7 @@ export class MongoDBConnection implements IDatabase {
 
     const result = await this._collection.updateMany(
       filter,
-      { $set: MongoDBHelper.stringToObjectId(document) },
+      MongoDBHelper.stringToObjectId(document),
       updateManyOptions,
     )
 
