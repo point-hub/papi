@@ -256,7 +256,7 @@ export class MongoDBConnection implements IDatabase {
     const updateManyOptions = options as UpdateOptions
 
     const result = await this._collection.updateMany(
-      filter,
+      MongoDBHelper.stringToObjectId(filter),
       MongoDBHelper.stringToObjectId(document),
       updateManyOptions,
     )
