@@ -1,6 +1,6 @@
 {
   "name": "@point-hub/papi",
-  "version": "0.5.11",
+  "version": "0.5.12",
   "description": "Point API Framework",
   "type": "module",
   "main": "lib/index.js",
@@ -33,25 +33,25 @@
     "url": "https://github.com/point-hub/papi.git"
   },
   "devDependencies": {
-    "@eslint/eslintrc": "^3.3.0",
-    "@eslint/js": "^9.22.0",
+    "@eslint/eslintrc": "^3.3.1",
+    "@eslint/js": "^9.24.0",
     "@types/compression": "^1.7.5",
     "@types/cors": "^2.8.17",
-    "@types/express": "^5.0.0",
-    "@types/node": "^22.13.10",
+    "@types/express": "^5.0.1",
+    "@types/node": "^22.14.1",
     "@types/shelljs": "^0.8.15",
     "@types/validatorjs": "^3.15.5",
-    "@typescript-eslint/eslint-plugin": "^8.26.1",
-    "@typescript-eslint/parser": "^8.26.1",
-    "bun-types": "^1.2.5",
+    "@typescript-eslint/eslint-plugin": "^8.30.1",
+    "@typescript-eslint/parser": "^8.30.1",
+    "bun-types": "^1.2.9",
     "cross-env": "^7.0.3",
-    "eslint": "^9.22.0",
-    "eslint-config-prettier": "^10.1.1",
-    "eslint-plugin-prettier": "^5.2.3",
+    "eslint": "^9.24.0",
+    "eslint-config-prettier": "^10.1.2",
+    "eslint-plugin-prettier": "^5.2.6",
     "eslint-plugin-simple-import-sort": "^12.1.1",
     "prettier": "^3.5.3",
-    "shx": "^0.3.4",
-    "typescript": "^5.8.2"
+    "shx": "^0.4.0",
+    "typescript": "^5.8.3"
   },
   "dependencies": {
     "@point-hub/express-cli": "^0.2.2",
@@ -59,11 +59,11 @@
     "@point-hub/express-factory": "^1.1.4",
     "@point-hub/express-utils": "^0.2.10",
     "date-fns": "^4.1.0",
-    "mongodb": "^6.14.2",
-    "shelljs": "^0.9.1"
+    "mongodb": "^6.15.0",
+    "shelljs": "^0.9.2"
   },
   "peerDependencies": {
-    "express": "^4.18.1"
+    "express": "^5.1.0"
   },
   "publishConfig": {
     "access": "public"
