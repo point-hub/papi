@@ -29,7 +29,7 @@ export class DatabaseTestUtil {
 
         for (const unique of listSchema[i][j].unique) {
           if (unique.length) {
-            console.info(`[schema] ${listSchema[i][j].collection} - create unique attribute "name"`)
+            console.info(`[schema] ${listSchema[i][j].collection} - create unique attribute "${unique}"`)
             await helper.createUnique(
               listSchema[i][j].collection,
               BaseMongoDBQuerystring.convertArrayToObject(unique, -1),
@@ -39,7 +39,7 @@ export class DatabaseTestUtil {
 
         for (const unique of listSchema[i][j].uniqueIfExists) {
           if (unique.length) {
-            console.info(`[schema] ${listSchema[i][j].collection} - create unique attribute "name"`)
+            console.info(`[schema] ${listSchema[i][j].collection} - create unique attribute "${unique}"`)
             await helper.createUniqueIfNotNull(
               listSchema[i][j].collection,
               BaseMongoDBQuerystring.convertArrayToObject(unique, -1),
