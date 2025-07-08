@@ -31,6 +31,7 @@ export const BaseDatabaseConnection = DatabaseConnection
 export const BaseMongoDBConnection = MongoDBConnection
 export const BaseMongoDBHelper = MongoDBHelper
 export const BaseMongoDBQuerystring = Querystring
+export { default as BaseMongoDBQueryFilters } from './database/mongodb/mongodb-query-filters'
 export const BaseMongoServerError = MongoServerError
 export const BaseMongoErrorHandler = MongoErrorHandler
 // Factory
