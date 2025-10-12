@@ -1,6 +1,6 @@
 {
   "name": "@point-hub/papi",
-  "version": "0.5.16",
+  "version": "0.5.17",
   "description": "Point API Framework",
   "type": "module",
   "main": "lib/index.js",
@@ -10,9 +10,9 @@
     "stub/"
   ],
   "scripts": {
-    "check-types": "tsc -p tsconfig.json",
+    "types": "tsc -p tsconfig.json",
     "dev": "shx rm -rf lib && bun run build.ts --watch",
-    "build": "shx rm -rf lib && bun run check-types && bun run build.ts && bun run build:declaration",
+    "build": "shx rm -rf lib && bun run types && bun run build.ts && bun run build:declaration",
     "build:declaration": "shx rm -rf tsconfig.tsbuildinfo && shx rm -rf tsconfig.types.tsbuildinfo && tsc -p tsconfig.types.json",
     "lint": "eslint ./src/**/*.ts",
     "lint:fix": "bun run lint -- --fix"
@@ -34,24 +34,24 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.1",
-    "@eslint/js": "^9.24.0",
-    "@types/compression": "^1.7.5",
-    "@types/cors": "^2.8.17",
-    "@types/express": "^5.0.1",
-    "@types/node": "^22.14.1",
-    "@types/shelljs": "^0.8.15",
+    "@eslint/js": "^9.37.0",
+    "@types/compression": "^1.8.1",
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.3",
+    "@types/node": "^24.7.2",
+    "@types/shelljs": "^0.8.17",
     "@types/validatorjs": "^3.15.5",
-    "@typescript-eslint/eslint-plugin": "^8.30.1",
-    "@typescript-eslint/parser": "^8.30.1",
-    "bun-types": "^1.2.9",
-    "cross-env": "^7.0.3",
-    "eslint": "^9.24.0",
-    "eslint-config-prettier": "^10.1.2",
-    "eslint-plugin-prettier": "^5.2.6",
+    "@typescript-eslint/eslint-plugin": "^8.46.0",
+    "@typescript-eslint/parser": "^8.46.0",
+    "bun-types": "^1.3.0",
+    "cross-env": "^10.1.0",
+    "eslint": "^9.37.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-prettier": "^5.5.4",
     "eslint-plugin-simple-import-sort": "^12.1.1",
-    "prettier": "^3.5.3",
+    "prettier": "^3.6.2",
     "shx": "^0.4.0",
-    "typescript": "^5.8.3"
+    "typescript": "^5.9.3"
   },
   "dependencies": {
     "@point-hub/express-cli": "^0.2.2",
@@ -59,8 +59,8 @@
     "@point-hub/express-factory": "^1.1.4",
     "@point-hub/express-utils": "^0.2.10",
     "date-fns": "^4.1.0",
-    "mongodb": "^6.15.0",
-    "shelljs": "^0.9.2"
+    "mongodb": "^6.20.0",
+    "shelljs": "^0.10.0"
   },
   "peerDependencies": {
     "express": "^5.1.0"
