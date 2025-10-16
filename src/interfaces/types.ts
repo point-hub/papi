@@ -202,6 +202,10 @@ export interface IMakeControllerInput {
   controller: IController
   dbConnection: IDatabase
 }
+export interface IMakeMiddlewareInput {
+  middleware: IMiddleware
+  dbConnection: IDatabase
+}
 /**
  * Router
  */
