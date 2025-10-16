@@ -22,6 +22,17 @@ export interface IControllerOutput {
   json?: any
 }
 /**
+ * Middleware
+ */
+export interface IMiddlewareInput {
+  httpRequest: IHttpRequest
+  dbConnection: IDatabase
+}
+
+export interface IMiddleware {
+  (input: IMiddlewareInput): Promise<void>
+}
+/**
  * UseCase
  */
 export interface IUseCase<TInput, TDeps, TOptions, TOutput> {

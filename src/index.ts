@@ -71,6 +71,8 @@ export type {
   IDocument,
   IHttpRequest,
   IMakeControllerInput,
+  IMiddleware,
+  IMiddlewareInput,
   IMongoDBConfig,
   IPagination,
   IPipeline,
