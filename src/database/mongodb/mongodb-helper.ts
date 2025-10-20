@@ -1,5 +1,5 @@
 import { isValid } from 'date-fns'
-import { ObjectId } from 'mongodb'
+import { CreateIndexesOptions, IndexSpecification, ObjectId } from 'mongodb'
 
 import { IDatabase } from '../../index'
 
@@ -54,6 +54,14 @@ export class MongoDBHelper {
         strength: 2,
       },
     })
+  }
+
+  public async createIndex(
+    collection: string,
+    spec: IndexSpecification,
+    options?: CreateIndexesOptions,
+  ): Promise<void> {
+    await this.db.createIndex(collection, spec, options)
   }
 
   public async isExists(name: string) {
