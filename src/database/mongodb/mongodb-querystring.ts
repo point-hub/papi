@@ -62,7 +62,7 @@ export function filter(filter: any) {
  * fields("name, address") // => { name: 1, address: 1 }
  */
 export function fields(fields = '', excludeFields: string[] = []): IFieldsObject {
-  const obj: IFieldsObject = convertArrayToObject(convertStringToArray(fields))
+  const obj: IFieldsObject = convertFieldObject(convertStringToArray(fields))
 
   return filterExludeFields(obj, excludeFields)
 }
@@ -85,15 +85,43 @@ export function convertStringToArray(fields: string): string[] {
  * Convert array to mongodb field object
  *
  * @example
- * convertArrayToObject(["name", "address"]) // => { name: 1, address: 1 }
- * convertArrayToObject(["name", "address"], -1) // => { name: -1, address: -1 }
+ * convertFieldObject(["name", "address"]) // => { name: 1, address: 1 }
+ * convertFieldObject(["name", "address"], -1) // => { name: -1, address: -1 }
  */
-export function convertArrayToObject(array: string[], value = 1): IFieldsObject {
+export function convertFieldObject(array: string[], value = 1): IFieldsObject {
   const obj: IFieldsObject = {}
   for (let i = 0; i < array.length; i++) {
     obj[`${array[i].trim()}`] = value
   }
   return obj
+}
+/**
+ * Converts a flat array of string fields (with optional negative prefix for descending)
+ * into a single object suitable for MongoDB-style sorting.
+ *
+ * Example:
+ * ['-firstName', 'lastName', 'created_at']
+ * becomes
+ * { firstName: -1, lastName: 1, created_at: 1 }
+ */
+export function convertSortObject(input: string[]): Record<string, 1 | -1> {
+  // The 'reduce' method is used to iterate over the array and build a single object
+  return input.reduce(
+    (sortObject, field) => {
+      // Check if the field starts with a negative sign
+      if (field.startsWith('-')) {
+        // Remove the '-' and set the value to -1 (descending)
+        const fieldName = field.substring(1)
+        sortObject[fieldName] = -1
+      } else {
+        // Set the value to 1 (ascending)
+        sortObject[field] = 1
+      }
+
+      return sortObject
+    },
+    {} as Record<string, 1 | -1>,
+  ) // Initialize the accumulator as an empty object
 }
 
 /**
@@ -140,5 +168,6 @@ export default {
   filter,
   filterExludeFields,
   convertStringToArray,
-  convertArrayToObject,
+  convertFieldObject,
+  convertSortObject,
 }

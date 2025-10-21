@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'bun:test'
 
 import {
-  convertArrayToObject,
+  convertFieldObject,
+  convertSortObject,
   convertStringToArray,
   fields,
   filterExludeFields,
@@ -17,9 +18,16 @@ describe('field', () => {
   })
 
   it('convert array to mongodb field object', async () => {
-    expect(convertArrayToObject(['name', 'password'])).toStrictEqual({
+    expect(convertFieldObject(['name', 'created_at'])).toStrictEqual({
       name: 1,
-      password: 1,
+      created_at: 1,
+    })
+  })
+
+  it('convert array to mongodb sort object', async () => {
+    expect(convertSortObject(['name', '-created_at'])).toStrictEqual({
+      name: 1,
+      created_at: -1,
     })
   })
 

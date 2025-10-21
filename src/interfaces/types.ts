@@ -84,6 +84,7 @@ export interface ISchema {
   collection: string
   unique: string[][]
   uniqueIfExists: string[][]
+  indexes: { spec: string[]; options: Record<string, any> }[]
   schema: Record<string, any>
 }
 
