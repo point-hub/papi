@@ -12,7 +12,7 @@ export interface IControllerInput {
 }
 
 export interface IController {
-  (input: IControllerInput): Promise<IControllerOutput>
+  (input: IControllerInput): Promise<IControllerOutput | void>
 }
 
 export interface IControllerOutput {
