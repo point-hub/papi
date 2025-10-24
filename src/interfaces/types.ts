@@ -1,14 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { NextFunction, Request, Response } from 'express'
 import { ClientSession } from 'mongodb'
 /**
  * Controller
  */
-export interface IHttpRequest {
-  [key: string]: any
-}
-
 export interface IControllerInput {
-  httpRequest: IHttpRequest
+  req: Request
+  res: Response
+  next: NextFunction
   dbConnection: IDatabase
 }
 
@@ -25,7 +24,9 @@ export interface IControllerOutput {
  * Middleware
  */
 export interface IMiddlewareInput {
-  httpRequest: IHttpRequest
+  req: Request
+  res: Response
+  next: NextFunction
   dbConnection: IDatabase
 }
 

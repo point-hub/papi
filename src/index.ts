@@ -69,7 +69,6 @@ export type {
   IDeleteOutput,
   IDeleteRepository,
   IDocument,
-  IHttpRequest,
   IMakeControllerInput,
   IMakeMiddlewareInput,
   IMiddleware,
