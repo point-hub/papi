@@ -32,9 +32,8 @@ export interface IOutputFailed {
  * making it reusable for any business logic operation.
  *
  * @param IInput - The type of the data passed to the handle method.
- * @param ISuccessData - The type of data returned on success.
- * @param IErrorData - The type of error object returned on failure (defaults to IIErrorData).
  * @param IDependencies - The type of the injected dependencies.
+ * @param ISuccessData - The type of data returned on success.
  */
 export abstract class BaseUseCase<
   IInput,
