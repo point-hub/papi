@@ -22,6 +22,7 @@ export const stubDir = import.meta.path.replace('/index.ts', '/../stub').replace
 
 // Abstact Class
 export { BaseUseCase } from './base-usecase'
+export type { IUseCaseOutputSuccess, IUseCaseOutputFailed, IUseCaseError } from './base-usecase'
 // Console
 export { ExpressCli as BaseConsoleCli } from '@point-hub/express-cli'
 export const BaseConsoleCommand = BaseCommand
