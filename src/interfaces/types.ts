@@ -34,12 +34,6 @@ export interface IMiddleware {
   (input: IMiddlewareInput): Promise<void>
 }
 /**
- * UseCase
- */
-export interface IUseCase<TInput, TDeps, TOptions, TOutput> {
-  handle(input: TInput, deps: TDeps, options?: TOptions): Promise<TOutput>
-}
-/**
  * Repository
  */
 export interface IAggregateRepository {

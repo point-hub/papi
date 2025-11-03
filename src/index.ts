@@ -20,6 +20,8 @@ import mongodbErrorHandlerMiddleware from './middleware/mongodb-error-handler.mi
 
 export const stubDir = import.meta.path.replace('/index.ts', '/../stub').replace('/index.js', '/../stub')
 
+// Abstact Class
+export { BaseUseCase } from './base-usecase'
 // Console
 export { ExpressCli as BaseConsoleCli } from '@point-hub/express-cli'
 export const BaseConsoleCommand = BaseCommand
@@ -88,5 +90,4 @@ export type {
   IUpdateManyRepository,
   IUpdateOutput,
   IUpdateRepository,
-  IUseCase,
 } from './interfaces/types'
