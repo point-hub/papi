@@ -9,8 +9,10 @@ export interface IUseCaseOutputSuccess<T> {
 
 // Define the structure of the standard error object for clarity
 export interface IUseCaseError {
-  message: string
   code: number
+  message: string
+  name?: string
+  status?: string
   errors?: {
     [key: string]: string[]
   }
@@ -61,7 +63,13 @@ export abstract class BaseUseCase<
    * @returns An IUseCaseOutputFailed object.
    */
   protected fail(error: IUseCaseError): IUseCaseOutputFailed {
-    return { status: 'failed', error }
+    return { 
+      status: 'failed',
+      error: {
+        name: 'ApiError',
+        ...error
+      } 
+    }
   }
 
   /**
