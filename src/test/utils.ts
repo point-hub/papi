@@ -32,7 +32,7 @@ export class DatabaseTestUtil {
             console.info(`[schema] ${listSchema[i][j].collection} - create unique attribute "${unique}"`)
             await helper.createUnique(
               listSchema[i][j].collection,
-              BaseMongoDBQuerystring.convertFieldObject(unique, -1),
+              BaseMongoDBQuerystring.convertFieldObject(unique, -1)
             )
           }
         }
@@ -42,7 +42,7 @@ export class DatabaseTestUtil {
             console.info(`[schema] ${listSchema[i][j].collection} - create unique attribute "${unique}"`)
             await helper.createUniqueIfNotNull(
               listSchema[i][j].collection,
-              BaseMongoDBQuerystring.convertFieldObject(unique, -1),
+              BaseMongoDBQuerystring.convertFieldObject(unique, -1)
             )
           }
         }

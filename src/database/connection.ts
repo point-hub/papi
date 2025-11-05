@@ -11,7 +11,7 @@ import {
   IRetrieveAllOutput,
   IRetrieveOutput,
   IUpdateManyOutput,
-  IUpdateOutput,
+  IUpdateOutput
 } from '../index'
 
 export class DatabaseConnection implements IDatabase {

@@ -14,7 +14,7 @@ import type {
   IndexSpecification,
   InsertOneOptions,
   MongoClientOptions,
-  UpdateOptions,
+  UpdateOptions
 } from 'mongodb'
 import { MongoClient, ObjectId } from 'mongodb'
 
@@ -31,7 +31,7 @@ import {
   IRetrieveAllOutput,
   IRetrieveOutput,
   IUpdateManyOutput,
-  IUpdateOutput,
+  IUpdateOutput
 } from '../../index'
 import { MongoDBHelper } from './mongodb-helper'
 import Querystring from './mongodb-querystring'
@@ -44,11 +44,11 @@ export class MongoDBConnection implements IDatabase {
 
   constructor(
     connectionString: string,
-    public databaseName: string,
+    public databaseName: string
   ) {
     const options: MongoClientOptions = {
       writeConcern: { w: 'majority' },
-      readConcern: { level: 'majority' },
+      readConcern: { level: 'majority' }
     }
 
     this.client = new MongoClient(connectionString, options)
@@ -101,8 +101,8 @@ export class MongoDBConnection implements IDatabase {
     await this._database.command({
       collMod: name,
       validator: {
-        $jsonSchema: schema,
-      },
+        $jsonSchema: schema
+      }
     })
   }
 
@@ -149,11 +149,12 @@ export class MongoDBConnection implements IDatabase {
     }
 
     const createOptions = options as InsertOneOptions
+    const buildPostData = MongoDBHelper.buildPostData(document)
 
-    const response = await this._collection.insertOne(MongoDBHelper.stringToObjectId(document), createOptions)
+    const response = await this._collection.insertOne(MongoDBHelper.stringToObjectId(buildPostData), createOptions)
 
     return {
-      inserted_id: response.insertedId.toString(),
+      inserted_id: response.insertedId.toString()
     }
   }
 
@@ -163,8 +164,9 @@ export class MongoDBConnection implements IDatabase {
     }
 
     const createManyOptions = options as BulkWriteOptions
+    const buildPostManyData = MongoDBHelper.buildPostManyData(documents)
 
-    const response = await this._collection.insertMany(MongoDBHelper.stringToObjectId(documents), createManyOptions)
+    const response = await this._collection.insertMany(MongoDBHelper.stringToObjectId(buildPostManyData), createManyOptions)
 
     // convert array of object to array of string
     const insertedIds: string[] = []
@@ -174,7 +176,7 @@ export class MongoDBConnection implements IDatabase {
 
     return {
       inserted_ids: insertedIds,
-      inserted_count: response.insertedCount,
+      inserted_count: response.insertedCount
     }
   }
 
@@ -207,8 +209,8 @@ export class MongoDBConnection implements IDatabase {
         page: Querystring.page(query.page),
         page_count: Math.ceil(totalDocument / Querystring.limit(query.page_size)),
         page_size: Querystring.limit(query.page_size),
-        total_document: totalDocument,
-      },
+        total_document: totalDocument
+      }
     }
   }
 
@@ -221,9 +223,9 @@ export class MongoDBConnection implements IDatabase {
 
     const result = await this._collection.findOne(
       {
-        _id: new ObjectId(_id),
+        _id: new ObjectId(_id)
       },
-      retrieveOptions,
+      retrieveOptions
     )
 
     return MongoDBHelper.objectIdToString(result)
@@ -235,16 +237,17 @@ export class MongoDBConnection implements IDatabase {
     }
 
     const updateOptions = options as UpdateOptions
+    const buildPatchData = MongoDBHelper.buildPatchData(document)
 
     const result = await this._collection.updateOne(
       { _id: new ObjectId(_id) },
-      MongoDBHelper.stringToObjectId(document),
-      updateOptions,
+      MongoDBHelper.stringToObjectId(buildPatchData),
+      updateOptions
     )
 
     return {
       modified_count: result.modifiedCount,
-      matched_count: result.matchedCount,
+      matched_count: result.matchedCount
     }
   }
 
@@ -254,16 +257,17 @@ export class MongoDBConnection implements IDatabase {
     }
 
     const updateManyOptions = options as UpdateOptions
+    const buildPatchData = MongoDBHelper.buildPatchData(document)
 
     const result = await this._collection.updateMany(
       MongoDBHelper.stringToObjectId(filter),
-      MongoDBHelper.stringToObjectId(document),
-      updateManyOptions,
+      MongoDBHelper.stringToObjectId(buildPatchData),
+      updateManyOptions
     )
 
     return {
       matched_count: result.matchedCount,
-      modified_count: result.modifiedCount,
+      modified_count: result.modifiedCount
     }
   }
 
@@ -276,9 +280,9 @@ export class MongoDBConnection implements IDatabase {
 
     const result = await this._collection.deleteOne(
       {
-        _id: new ObjectId(_id),
+        _id: new ObjectId(_id)
       },
-      deleteOptions,
+      deleteOptions
     )
 
     return { deleted_count: result.deletedCount }
@@ -294,10 +298,10 @@ export class MongoDBConnection implements IDatabase {
     const result = await this._collection.deleteMany(
       {
         _id: {
-          $in: MongoDBHelper.stringToObjectId(_ids),
-        },
+          $in: MongoDBHelper.stringToObjectId(_ids)
+        }
       },
-      deleteOptions,
+      deleteOptions
     )
 
     return { deleted_count: result.deletedCount }
@@ -339,17 +343,17 @@ export class MongoDBConnection implements IDatabase {
           $facet: {
             paginated_result: [
               { $skip: (Querystring.page(query?.page) - 1) * Querystring.limit(query?.page_size) },
-              { $limit: Querystring.limit(query?.page_size) },
+              { $limit: Querystring.limit(query?.page_size) }
             ],
             total_document: [
               {
-                $count: 'total_document',
-              },
-            ],
-          },
-        },
+                $count: 'total_document'
+              }
+            ]
+          }
+        }
       ],
-      aggregateOptions,
+      aggregateOptions
     )
 
     const result = await cursor.toArray()
@@ -362,8 +366,8 @@ export class MongoDBConnection implements IDatabase {
         page: Querystring.page(query?.page),
         page_count: totalDocument ? Math.ceil(totalDocument / Querystring.limit(query?.page_size)) : 0,
         page_size: Querystring.limit(query?.page_size),
-        total_document: totalDocument ?? 0,
-      },
+        total_document: totalDocument ?? 0
+      }
     }
   }
 }
