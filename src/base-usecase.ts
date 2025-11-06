@@ -63,12 +63,12 @@ export abstract class BaseUseCase<
    * @returns An IUseCaseOutputFailed object.
    */
   protected fail(error: IUseCaseError): IUseCaseOutputFailed {
-    return { 
+    return {
       status: 'failed',
       error: {
         name: 'ApiError',
         ...error
-      } 
+      }
     }
   }
 

@@ -9,7 +9,7 @@ import {
   limit,
   page,
   skip,
-  sort,
+  sort
 } from './mongodb-querystring'
 
 describe('field', () => {
@@ -20,14 +20,14 @@ describe('field', () => {
   it('convert array to mongodb field object', async () => {
     expect(convertFieldObject(['name', 'created_at'])).toStrictEqual({
       name: 1,
-      created_at: 1,
+      created_at: 1
     })
   })
 
   it('convert array to mongodb sort object', async () => {
     expect(convertSortObject(['name', '-created_at'])).toStrictEqual({
       name: 1,
-      created_at: -1,
+      created_at: -1
     })
   })
 
@@ -36,18 +36,18 @@ describe('field', () => {
     const excluded = ['password']
     const result = {
       ...obj,
-      ...filterExludeFields(obj, excluded),
+      ...filterExludeFields(obj, excluded)
     }
     expect(result).toStrictEqual({
       name: 1,
-      password: 0,
+      password: 0
     })
   })
 
   it('filter fields', async () => {
     const result = fields('', ['password'])
     expect(result).toStrictEqual({
-      password: 0,
+      password: 0
     })
   })
 })
@@ -82,7 +82,7 @@ describe('sort', () => {
   it('convert string to mongodb sort object', async () => {
     expect(sort('name,-address')).toStrictEqual({
       name: 1,
-      address: -1,
+      address: -1
     })
   })
 })

@@ -17,19 +17,19 @@ export function handleUniqueValidation(err: MongoServerError, error: IError) {
   // handle unique validation
   if (Object.keys(err.keyPattern).length === 1) {
     error.errors = {
-      [Object.keys(err.keyPattern)[0]]: [`The ${Object.keys(err.keyPattern)[0]} is exists.`],
+      [Object.keys(err.keyPattern)[0]]: [`The ${Object.keys(err.keyPattern)[0]} is exists.`]
     }
   } else {
     // get keys
     const keys = Object.keys(err.keyPattern).reduce((keys: string, key, index) => {
       if (index === 0) {
-        keys += `'`
+        keys += '\''
       }
       keys += `${key.toString()}`
       if (index === Object.keys(err.keyPattern).length - 1) {
-        keys += `'`
+        keys += '\''
       } else {
-        keys += `, `
+        keys += ', '
       }
       return keys
     }, '')

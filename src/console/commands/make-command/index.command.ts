@@ -14,10 +14,10 @@ export default class MakeCommand extends BaseCommand {
       arguments: [
         {
           name: 'name',
-          description: 'Name of console command',
-        },
+          description: 'Name of console command'
+        }
       ],
-      options: [],
+      options: []
     })
   }
   async handle(): Promise<void> {

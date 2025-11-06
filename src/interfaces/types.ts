@@ -94,6 +94,7 @@ export interface IQuery {
   page?: number
   page_size?: number
   sort?: string
+  [key: string]: any
 }
 
 export interface IPipeline {

@@ -15,25 +15,25 @@ export default [
       '**/build/**',
       '**/.env*',
       '**/coverage/**',
-      '**/tsconfig.tsbuildinfo',
+      '**/tsconfig.tsbuildinfo'
     ],
 
     languageOptions: {
       parser: tsParser,
       parserOptions: {
         ecmaVersion: 'latest',
-        sourceType: 'module',
+        sourceType: 'module'
       },
       globals: {
         ...globals.node,
         ...globals.es2021,
-        Bun: true,
-      },
+        Bun: true
+      }
     },
 
     plugins: {
       '@typescript-eslint': typescriptEslint,
-      'simple-import-sort': simpleImportSort,
+      'simple-import-sort': simpleImportSort
     },
 
     rules: {
@@ -55,7 +55,7 @@ export default [
       'object-curly-spacing': ['error', 'always'],
       'comma-dangle': ['error', 'never'],
       'no-trailing-spaces': 'error',
-      'eol-last': ['error', 'always'],
-    },
-  },
+      'eol-last': ['error', 'always']
+    }
+  }
 ]

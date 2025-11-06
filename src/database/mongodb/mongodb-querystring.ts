@@ -120,7 +120,7 @@ export function convertSortObject(input: string[]): Record<string, 1 | -1> {
 
       return sortObject
     },
-    {} as Record<string, 1 | -1>,
+    {} as Record<string, 1 | -1>
   ) // Initialize the accumulator as an empty object
 }
 
@@ -169,5 +169,5 @@ export default {
   filterExludeFields,
   convertStringToArray,
   convertFieldObject,
-  convertSortObject,
+  convertSortObject
 }

@@ -23,7 +23,7 @@ describe('server', () => {
 
     await server.start(80)
 
-    expect(server.url).toEqual(`http://localhost`)
+    expect(server.url).toEqual('http://localhost')
 
     server.stop()
   })

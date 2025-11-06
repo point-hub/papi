@@ -27,7 +27,7 @@ describe('make:command', () => {
   it('should create new command', async () => {
     const makeCommand = new MakeCommand()
     makeCommand.args = {
-      name: generateRandomName(),
+      name: generateRandomName()
     }
     const spy = spyOn(makeCommand, 'handle')
     await makeCommand.handle()
@@ -37,10 +37,10 @@ describe('make:command', () => {
     expect(spy).toHaveBeenCalled()
   })
 
-  it("should return error 'command directory exists'", async () => {
+  it('should return error \'command directory exists\'', async () => {
     const makeCommand = new MakeCommand()
     makeCommand.args = {
-      name: generateRandomName(),
+      name: generateRandomName()
     }
     const spy = spyOn(makeCommand, 'handle')
 

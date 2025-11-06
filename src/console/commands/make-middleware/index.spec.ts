@@ -26,7 +26,7 @@ describe('make:middleware', () => {
   it('should create new middleware', async () => {
     const makeMiddlewareCommand = new MakeMiddlewareCommand()
     makeMiddlewareCommand.args = {
-      name: generateRandomName(),
+      name: generateRandomName()
     }
     const spy = spyOn(makeMiddlewareCommand, 'handle')
     await makeMiddlewareCommand.handle()
@@ -39,10 +39,10 @@ describe('make:middleware', () => {
   it('should create new configureable middleware', async () => {
     const makeMiddlewareCommand = new MakeMiddlewareCommand()
     makeMiddlewareCommand.args = {
-      name: generateRandomName(),
+      name: generateRandomName()
     }
     makeMiddlewareCommand.opts = {
-      '--configurable': true,
+      '--configurable': true
     }
     const spy = spyOn(makeMiddlewareCommand, 'handle')
     await makeMiddlewareCommand.handle()
@@ -52,10 +52,10 @@ describe('make:middleware', () => {
     expect(spy).toHaveBeenCalled()
   })
 
-  it("should return error 'middleware directory exists'", async () => {
+  it('should return error \'middleware directory exists\'', async () => {
     const makeMiddlewareCommand = new MakeMiddlewareCommand()
     makeMiddlewareCommand.args = {
-      name: generateRandomName(),
+      name: generateRandomName()
     }
     const spy = spyOn(makeMiddlewareCommand, 'handle')
 

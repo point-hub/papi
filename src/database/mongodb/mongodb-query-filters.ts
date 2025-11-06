@@ -62,7 +62,7 @@ export const addNumberFilter = (filters: Record<string, unknown>[], field: strin
  * @throws Will throw an API error if the input format is invalid or has duplicate bounds.
  */
 export const parseComparisons = (
-  expr: string,
+  expr: string
 ): {
   gt?: number
   gte?: number
@@ -89,20 +89,20 @@ export const parseComparisons = (
     matchedStr += full
 
     switch (operator) {
-      case '>':
-      case '>=':
-        if (hasLowerBound)
-          throw new BaseErrorHandler.ApiError('Bad Request', { message: 'Only one lower-bound operator allowed.' })
-        result[operator === '>' ? 'gt' : 'gte'] = value
-        hasLowerBound = true
-        break
-      case '<':
-      case '<=':
-        if (hasUpperBound)
-          throw new BaseErrorHandler.ApiError('Bad Request', { message: 'Only one upper-bound operator allowed.' })
-        result[operator === '<' ? 'lt' : 'lte'] = value
-        hasUpperBound = true
-        break
+    case '>':
+    case '>=':
+      if (hasLowerBound)
+        throw new BaseErrorHandler.ApiError('Bad Request', { message: 'Only one lower-bound operator allowed.' })
+      result[operator === '>' ? 'gt' : 'gte'] = value
+      hasLowerBound = true
+      break
+    case '<':
+    case '<=':
+      if (hasUpperBound)
+        throw new BaseErrorHandler.ApiError('Bad Request', { message: 'Only one upper-bound operator allowed.' })
+      result[operator === '<' ? 'lt' : 'lte'] = value
+      hasUpperBound = true
+      break
     }
   }
 
@@ -116,5 +116,5 @@ export const parseComparisons = (
 export default {
   parseComparisons,
   addNumberFilter,
-  addRegexFilter,
+  addRegexFilter
 }

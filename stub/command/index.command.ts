@@ -7,7 +7,7 @@ export default class NewCommand extends BaseCommand {
       description: '[description]',
       summary: '[summary]',
       arguments: [],
-      options: [],
+      options: []
     })
   }
   async handle(): Promise<void> {

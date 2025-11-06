@@ -14,17 +14,17 @@ export default class MakeMiddleware extends BaseCommand {
       arguments: [
         {
           name: 'name',
-          description: 'Name of middleware',
-        },
+          description: 'Name of middleware'
+        }
       ],
       options: [
         {
           type: 'boolean',
           flag: '--configurable',
           shorthand: '-c',
-          description: 'Export a function which accepts an options',
-        },
-      ],
+          description: 'Export a function which accepts an options'
+        }
+      ]
     })
   }
 
@@ -58,7 +58,7 @@ export default class MakeMiddleware extends BaseCommand {
     const stubTest = fs
       .readFileSync(path.resolve(stubDir, './middleware/new.spec.ts'))
       .toString()
-      .replace('new.middleware.ts', `index.middleware.ts`)
+      .replace('new.middleware.ts', 'index.middleware.ts')
     fs.writeFileSync(`${process.cwd()}/src/middleware/${kebabCase(this.args.name)}/index.spec.ts`, stubTest)
 
     console.info(`src/middleware/${kebabCase(this.args.name)}/index.middleware.ts`, 'has been created')
@@ -77,7 +77,7 @@ export default class MakeMiddleware extends BaseCommand {
     const stubTest = fs
       .readFileSync(path.resolve(stubDir, './middleware/configurable.spec.ts'))
       .toString()
-      .replace('configurable.middleware.ts', `index.middleware.ts`)
+      .replace('configurable.middleware.ts', 'index.middleware.ts')
     fs.writeFileSync(`${process.cwd()}/src/middleware/${kebabCase(this.args.name)}/index.spec.ts`, stubTest)
 
     console.info(`src/middleware/${kebabCase(this.args.name)}/index.middleware.ts`, 'has been created')

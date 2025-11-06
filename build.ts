@@ -3,5 +3,5 @@ await Bun.build({
   splitting: false,
   minify: false,
   target: 'bun',
-  outdir: './lib',
+  outdir: './lib'
 })
