@@ -14,6 +14,7 @@ import type {
   IndexSpecification,
   InsertOneOptions,
   MongoClientOptions,
+  RunCommandOptions,
   UpdateOptions
 } from 'mongodb'
 import { MongoClient, ObjectId } from 'mongodb'
@@ -141,6 +142,14 @@ export class MongoDBConnection implements IDatabase {
 
   public async abortTransaction() {
     await this.session?.abortTransaction()
+  }
+
+  public async command(command: IDocument, options?: unknown): Promise<IDocument> {
+    if (!this._database) {
+      throw new Error('Database not found')
+    }
+    const commandOptions = options as RunCommandOptions
+    return await this._database.command(command, commandOptions)
   }
 
   public async create(document: IDocument, options?: unknown): Promise<ICreateOutput> {

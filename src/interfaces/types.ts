@@ -178,6 +178,7 @@ export interface IDatabase {
   createCollection(name: string, options?: unknown): Promise<void>
   dropCollection(name: string, options?: unknown): Promise<void>
   updateSchema(name: string, schema: unknown): Promise<void>
+  command(document: IDocument, options?: unknown): Promise<IDocument>
   create(document: IDocument, options?: unknown): Promise<ICreateOutput>
   createMany(documents: IDocument[], options?: unknown): Promise<ICreateManyOutput>
   retrieveAll(query: IQuery, options?: unknown): Promise<IRetrieveAllOutput>

@@ -61,6 +61,9 @@ export class DatabaseConnection implements IDatabase {
   public async updateSchema(name: string, schema: unknown) {
     await this.adapter.updateSchema(name, schema)
   }
+  public async command(document: IDocument, options?: unknown): Promise<IDocument> {
+    return await this.adapter.command(document, options)
+  }
   public async create(document: IDocument, options?: unknown): Promise<ICreateOutput> {
     return await this.adapter.create(document, options)
   }
