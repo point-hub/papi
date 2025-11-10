@@ -1,3 +1,4 @@
+import { isType } from '@point-hub/express-utils'
 import { isValid } from 'date-fns'
 import { CreateIndexesOptions, IndexSpecification, ObjectId } from 'mongodb'
 
@@ -219,19 +220,26 @@ export class MongoDBHelper {
         const value = obj[key]
 
         if (value === undefined) {
-        // Ignore undefined values.
+          // Ignore undefined values.
           continue
 
         } else if (value === null) {
-        // Use null to signal field removal via $unset.
+          // Use null to signal field removal via $unset.
           unsetOperations[currentKey] = true
 
-        } else if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
-        // Recurse into non-null, non-array objects.
+        } else if (
+          isType(value, 'object') &&
+          value !== null &&
+          !Array.isArray(value) &&
+          !isType(value, 'date') &&
+          !isType(value, 'function') &&
+          !(value instanceof ObjectId)
+        ) {
+          // Recurse into non-null, non-array objects.
           flattenAndSeparate(value, currentKey + '.')
 
         } else {
-        // Primitive value or Array: Add to $set.
+          // Primitive value or Array: Add to $set.
           setOperations[currentKey] = value
         }
       }

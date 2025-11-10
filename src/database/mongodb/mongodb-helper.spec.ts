@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'bun:test'
+import { ObjectId } from 'mongodb'
 
 import { MongoDBHelper } from './mongodb-helper'
 
@@ -134,6 +135,47 @@ describe('MongoDBHelper.buildPostData', () => {
     })
     // Ensure the empty object was removed, reducing the array size to 2
     expect(result.items.length).toBe(2)
+  })
+
+  it('8. Should keep Date objects intact', () => {
+    const date = new Date()
+    const rawInput = {
+      createdAt: date,
+      updatedAt: null, // Should be removed
+      meta: {
+        timestamp: date,
+        deletedAt: undefined // Should be removed
+      }
+    }
+
+    const result = MongoDBHelper.buildPostData(rawInput)
+
+    expect(result).toEqual({
+      createdAt: date,
+      meta: { timestamp: date }
+    })
+    expect(result.createdAt).toBeInstanceOf(Date)
+    expect(result.meta.timestamp).toBeInstanceOf(Date)
+  })
+
+  it('9. Should keep ObjectId instances intact', () => {
+    const id = new ObjectId()
+    const rawInput = {
+      _id: id,
+      nested: {
+        ref: id,
+        empty: {}
+      }
+    }
+
+    const result = MongoDBHelper.buildPostData(rawInput)
+
+    expect(result).toEqual({
+      _id: id,
+      nested: { ref: id }
+    })
+    expect(result._id).toBeInstanceOf(ObjectId)
+    expect(result.nested.ref).toBeInstanceOf(ObjectId)
   })
 })
 
