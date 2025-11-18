@@ -4,6 +4,16 @@ import { CreateIndexesOptions, IndexSpecification, ObjectId } from 'mongodb'
 
 import { IDatabase } from '../../index'
 
+type ObjectIdToString<T> = T extends ObjectId
+  ? string // If T is ObjectId, the result is string
+  : T extends (infer U)[]
+  ? ObjectIdToString<U>[] // If T is an array, map the elements
+  : T extends Date // Exclude Date from deep mapping
+  ? T
+  : T extends object // If T is a plain object, recursively map its properties
+  ? { [K in keyof T]: ObjectIdToString<T[K]> }
+  : T; // Otherwise, return the type as is (primitives, null, etc.)
+
 function isPlainObject(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value) && !(value instanceof Date)
 }
@@ -176,29 +186,53 @@ export class MongoDBHelper {
     return input
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  public static objectIdToString(val: any): any {
-    if (val == null) return null
-    if (Array.isArray(val)) {
-      return val.map((item) => {
-        return MongoDBHelper.objectIdToString(item)
-      })
-    } else if (typeof val === 'object' && ObjectId.isValid(val)) {
-      return val.toString()
-    } else if (typeof val === 'object' && !isValid(val)) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      return Object.keys(val).reduce((obj: any, key) => {
-        if (ObjectId.isValid(val) || isValid(val)) {
-          return val.toString()
-        } else {
-          const propVal = MongoDBHelper.objectIdToString(val[key])
-          obj[key] = propVal
-          return obj
-        }
-      }, {})
+  /**
+   * Recursively converts all ObjectId instances within a structure to strings.
+   * @param value The input data structure.
+   * @returns The data structure with ObjectId instances converted to strings.
+   */
+  public static objectIdToString<T>(value: T): ObjectIdToString<T> {
+    // null / undefined
+    if (value == null) {
+      return value as ObjectIdToString<T> // Cast as T is T or null/undefined
     }
 
-    return val
+    // ObjectId → string
+    if (value instanceof ObjectId) {
+      return value.toString() as ObjectIdToString<T>
+    }
+
+    // Array
+    if (Array.isArray(value)) {
+      // The map ensures the type is handled correctly by the utility type
+      const arr = value.map(item =>
+        MongoDBHelper.objectIdToString(item)
+      )
+      // The return type is guaranteed to be ObjectIdToString<T> due to the map
+      return arr as ObjectIdToString<T>
+    }
+
+    // Date → leave unchanged
+    if (value instanceof Date) {
+      return value as ObjectIdToString<T>
+    }
+
+    // Plain object
+    if (typeof value === 'object') {
+      const obj = value as Record<string, unknown>
+      const result: Record<string, unknown> = {}
+
+      for (const key of Object.keys(obj)) {
+        // Recursive call
+        result[key] = MongoDBHelper.objectIdToString(obj[key])
+      }
+
+      // Cast the resulting object to the complex mapped type
+      return result as ObjectIdToString<T>
+    }
+
+    // Primitive → unchanged
+    return value as ObjectIdToString<T>
   }
 
   /**
