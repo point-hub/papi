@@ -4,6 +4,67 @@ import { CreateIndexesOptions, IndexSpecification, ObjectId } from 'mongodb'
 
 import { IDatabase } from '../../index'
 
+function isPlainObject(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value) && !(value instanceof Date)
+}
+
+function isString(value: unknown): value is string {
+  return typeof value === 'string'
+}
+
+function expandDottedKey(key: string, value: unknown): Record<string, unknown> {
+  const parts = key.split('.')
+  return parts.reduceRight<Record<string, unknown>>(
+    (acc, part) => ({ [part]: acc }),
+    value as Record<string, unknown>
+  )
+}
+
+function deepMerge<T extends Record<string, unknown>, U extends Record<string, unknown>>(
+  target: T,
+  source: U
+): T & U {
+  const result: Record<string, unknown> = { ...target }
+
+  for (const key of Object.keys(source)) {
+    const sourceVal = source[key]
+    const targetVal = result[key]
+
+    if (isPlainObject(sourceVal) && isPlainObject(targetVal)) {
+      result[key] = deepMerge(
+        targetVal as Record<string, unknown>,
+        sourceVal as Record<string, unknown>
+      )
+    } else {
+      result[key] = sourceVal
+    }
+  }
+
+  return result as T & U
+}
+
+function stringToDateIfISODateTime(str: string): string | Date {
+  if (!str.includes('T')) return str
+
+  const timestamp = Date.parse(str)
+  if (Number.isNaN(timestamp)) return str
+
+  return new Date(timestamp)
+}
+
+function convertPrimitive(value: unknown): unknown {
+  if (!isString(value)) return value
+
+  // Convert to ObjectId
+  if (ObjectId.isValid(value)) {
+    const oid = new ObjectId(value)
+    if (oid.toString() === value) return oid
+  }
+
+  // Convert to Date
+  return stringToDateIfISODateTime(value)
+}
+
 /**
  * https://www.mongodb.com/docs/drivers/node/current/fundamentals/indexes/
  * https://www.mongodb.com/docs/manual/reference/collation/
@@ -72,25 +133,47 @@ export class MongoDBHelper {
     })
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  public static stringToObjectId(val: any): any {
-    if (val == null) return null
-    if (Array.isArray(val)) {
-      return val.map((item) => {
-        return MongoDBHelper.stringToObjectId(item)
-      })
-    } else if (typeof val === 'object' && !isValid(val)) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      return Object.keys(val).reduce((obj: any, key) => {
-        const propVal = MongoDBHelper.stringToObjectId(val[key])
-        obj[key] = propVal
-        return obj
-      }, {})
-    } else if (typeof val === 'string' && ObjectId.isValid(val) && val === new ObjectId(val).toString()) {
-      return new ObjectId(val)
+  public static stringToObjectId(ids: string[]): ObjectId[];
+  public static stringToObjectId<T>(input: T): T;
+  public static stringToObjectId(input: unknown): unknown {
+    if (input === null || input === undefined) return input
+
+    // Date
+    if (input instanceof Date) return input
+
+    // Primitive
+    if (typeof input !== 'object') {
+      return convertPrimitive(input)
     }
 
-    return val
+    // Array
+    if (Array.isArray(input)) {
+      return input.map(item => MongoDBHelper.stringToObjectId(item))
+    }
+
+    // Plain object
+    if (isPlainObject(input)) {
+      let expanded: Record<string, unknown> = {}
+
+      // Expand dotted keys then merge
+      for (const [key, value] of Object.entries(input)) {
+        const fragment = key.includes('.')
+          ? expandDottedKey(key, value)
+          : { [key]: value }
+
+        expanded = deepMerge(expanded, fragment)
+      }
+
+      // Recursively transform children
+      const output: Record<string, unknown> = {}
+      for (const [key, value] of Object.entries(expanded)) {
+        output[key] = MongoDBHelper.stringToObjectId(value)
+      }
+
+      return output
+    }
+
+    return input
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
