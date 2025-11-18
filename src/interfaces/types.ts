@@ -182,7 +182,7 @@ export interface IDatabase {
   create(document: IDocument, options?: unknown): Promise<ICreateOutput>
   createMany(documents: IDocument[], options?: unknown): Promise<ICreateManyOutput>
   retrieveAll(query: IQuery, options?: unknown): Promise<IRetrieveAllOutput>
-  retrieve(_id: string, options?: unknown): Promise<IRetrieveOutput>
+  retrieve(_id: string, options?: unknown): Promise<IRetrieveOutput | null>
   update(_id: string, document: IDocument, options?: unknown): Promise<IUpdateOutput>
   updateMany(filter: IDocument, document: IDocument, options?: unknown): Promise<IUpdateManyOutput>
   delete(_id: string, options?: unknown): Promise<IDeleteOutput>

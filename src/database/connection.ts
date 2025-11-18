@@ -73,7 +73,7 @@ export class DatabaseConnection implements IDatabase {
   public async retrieveAll(query: IQuery, options?: unknown): Promise<IRetrieveAllOutput> {
     return await this.adapter.retrieveAll(query, options)
   }
-  public async retrieve(_id: string, options?: unknown): Promise<IRetrieveOutput> {
+  public async retrieve(_id: string, options?: unknown): Promise<IRetrieveOutput | null> {
     return await this.adapter.retrieve(_id, options)
   }
   public async update(_id: string, document: IDocument, options?: unknown): Promise<IUpdateOutput> {

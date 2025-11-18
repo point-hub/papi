@@ -223,7 +223,7 @@ export class MongoDBConnection implements IDatabase {
     }
   }
 
-  public async retrieve(_id: string, options?: any): Promise<IRetrieveOutput> {
+  public async retrieve(_id: string, options?: any): Promise<IRetrieveOutput | null> {
     if (!this._collection) {
       throw new Error('Collection not found')
     }
