@@ -61,7 +61,7 @@
   },
   "peerDependencies": {
     "express": "^5.1.0",
-    "mongodb": "^6.20.0"
+    "mongodb": "^7.0.0"
   },
   "publishConfig": {
     "access": "public"
