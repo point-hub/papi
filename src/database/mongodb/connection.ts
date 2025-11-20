@@ -195,8 +195,11 @@ export class MongoDBConnection implements IDatabase {
     }
     const retrieveOptions = options as FindOptions
 
+    const transformedQuery = MongoDBHelper.stringToObjectId(query)
+    const filter = transformedQuery?.filter ?? {}
+
     const cursor = this._collection
-      .find(MongoDBHelper.stringToObjectId(query.filter ?? {}), retrieveOptions)
+      .find(filter, retrieveOptions)
       .limit(Querystring.limit(query.page_size))
       .skip(Querystring.skip(Querystring.page(query.page), Querystring.limit(query.page_size)))
 
@@ -208,9 +211,10 @@ export class MongoDBConnection implements IDatabase {
     if (!isEmpty(fields)) {
       cursor.project(fields)
     }
-    const result = await cursor.toArray()
 
-    const totalDocument = await this._collection.countDocuments(query.filter ?? {}, retrieveOptions)
+    const totalDocument = await this._collection.countDocuments(filter)
+
+    const result = await cursor.toArray()
 
     return {
       data: MongoDBHelper.objectIdToString(result) as unknown[] as IRetrieveOutput[],
@@ -333,6 +337,14 @@ export class MongoDBConnection implements IDatabase {
       throw new Error('Collection not found')
     }
 
+    const transformedQuery = MongoDBHelper.stringToObjectId(query)
+
+    if (transformedQuery?.filter) {
+      pipeline.unshift({
+        $match: transformedQuery.filter
+      })
+    }
+
     const aggregateOptions = options as AggregateOptions
     const convertedPipeline = MongoDBHelper.stringToObjectId(pipeline)
 
@@ -356,7 +368,7 @@ export class MongoDBConnection implements IDatabase {
             ],
             total_document: [
               {
-                $count: 'total_document'
+                $count: 'count'
               }
             ]
           }
@@ -367,7 +379,7 @@ export class MongoDBConnection implements IDatabase {
 
     const result = await cursor.toArray()
 
-    const totalDocument = result[0]?.total_document[0]?.total_document ?? 0
+    const totalDocument = result[0]?.total_document[0]?.count ?? 0
 
     return {
       data: MongoDBHelper.objectIdToString(result[0].paginated_result),

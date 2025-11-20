@@ -148,7 +148,10 @@ export class MongoDBHelper {
   public static stringToObjectId(input: unknown): unknown {
     if (input === null || input === undefined) return input
 
-    // Date
+    // Already ObjectId → return as-is
+    if (input instanceof ObjectId) return input
+
+    // Date → return as-is
     if (input instanceof Date) return input
 
     // Primitive
