@@ -195,7 +195,12 @@ export class MongoDBConnection implements IDatabase {
     }
     const retrieveOptions = options as FindOptions
 
+    console.log('query', query)
+
     const transformedQuery = MongoDBHelper.stringToObjectId(query)
+
+    console.log('transformedQuery', transformedQuery)
+
     const filter = transformedQuery?.filter ?? {}
 
     const cursor = this._collection
@@ -337,7 +342,11 @@ export class MongoDBConnection implements IDatabase {
       throw new Error('Collection not found')
     }
 
+    console.log('aggregate query', query)
+
     const transformedQuery = MongoDBHelper.stringToObjectId(query)
+
+    console.log('aggregate transformedQuery', transformedQuery)
 
     if (transformedQuery?.filter) {
       pipeline.unshift({

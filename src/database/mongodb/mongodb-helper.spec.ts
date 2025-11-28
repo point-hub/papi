@@ -378,7 +378,6 @@ describe('MongoDBHelper.buildPatchData', () => {
     })
   })
 
-
   it('7. Should add arrays to $set as a primitive value (no deep recursion into arrays)', () => {
     const rawInput = {
       tags: ['js', 'ts'],
@@ -420,6 +419,106 @@ describe('MongoDBHelper.buildPatchData', () => {
       },
       $unset: {
         'lvl1.lvl2.data': true
+      }
+    })
+  })
+})
+
+describe('expandDottedObject', () => {
+  it('should expand only the first segment of dotted keys', () => {
+    const input = {
+      'filter.email_verification.code': 'abcd',
+      'user.code': 'abcd'
+    }
+
+    const output = MongoDBHelper.expandDottedObject(input)
+
+    expect(output).toEqual({
+      filter: {
+        'email_verification.code': 'abcd'
+      },
+      'user.code': 'abcd'
+    })
+  })
+
+  it('should not expand keys without dots', () => {
+    const input = {
+      filter: '123',
+      user: 'abc'
+    }
+
+    const output = MongoDBHelper.expandDottedObject(input)
+
+    expect(output).toEqual({
+      filter: '123',
+      user: 'abc'
+    })
+  })
+
+  it('should group multiple keys under the same top-level segment', () => {
+    const input = {
+      'filter.a.b': 1,
+      'filter.x.y': 2
+    }
+
+    const output = MongoDBHelper.expandDottedObject(input)
+
+    expect(output).toEqual({
+      filter: {
+        'a.b': 1,
+        'x.y': 2
+      }
+    })
+  })
+
+  it('should keep non-filter dotted keys intact', () => {
+    const input = {
+      'meta.created.at': 'now',
+      'meta.updated.at': 'later'
+    }
+
+    const output = MongoDBHelper.expandDottedObject(input)
+
+    expect(output).toEqual({
+      'meta.created.at': 'now',
+      'meta.updated.at': 'later'
+    })
+  })
+
+  it('should not perform deep expansion of the nested dotted key', () => {
+    const input = {
+      'filter.a.b.c': 'value'
+    }
+
+    const output = MongoDBHelper.expandDottedObject(input)
+
+    expect(output).toEqual({
+      filter: {
+        'a.b.c': 'value'
+      }
+    })
+  })
+
+  it('should handle empty object', () => {
+    const input = {}
+
+    const output = MongoDBHelper.expandDottedObject(input)
+
+    expect(output).toEqual({})
+  })
+
+  it('should preserve non-object values', () => {
+    const input = {
+      'filter.x.y': null,
+      'filter.a.b': 123
+    }
+
+    const output = MongoDBHelper.expandDottedObject(input)
+
+    expect(output).toEqual({
+      filter: {
+        'x.y': null,
+        'a.b': 123
       }
     })
   })
