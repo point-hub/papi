@@ -437,7 +437,9 @@ describe('expandDottedObject', () => {
       filter: {
         'email_verification.code': 'abcd'
       },
-      'user.code': 'abcd'
+      user: {
+        code: 'abcd'
+      }
     })
   })
 
@@ -480,8 +482,14 @@ describe('expandDottedObject', () => {
     const output = MongoDBHelper.expandDottedObject(input)
 
     expect(output).toEqual({
-      'meta.created.at': 'now',
-      'meta.updated.at': 'later'
+      meta: {
+        created: {
+          at: 'now'
+        },
+        updated: {
+          at: 'later'
+        }
+      }
     })
   })
 

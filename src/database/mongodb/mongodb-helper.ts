@@ -146,42 +146,46 @@ export class MongoDBHelper {
   public static stringToObjectId(ids: string[]): ObjectId[];
   public static stringToObjectId<T>(input: T): T;
   public static stringToObjectId(input: unknown): unknown {
+    // If it's NOT an object, just convert primitive
     if (!isPlainObject(input)) {
       return MongoDBHelper.convertToObjectId(input)
     }
 
-    const output: Record<string, unknown> = {}
+    // Expand dotted KEYS
+    const expanded = MongoDBHelper.expandDottedObject(input)
 
-    for (const [key, value] of Object.entries(input)) {
-      const expanded = MongoDBHelper.expandDottedObject(value as Record<string, unknown>)
-      output[key] = MongoDBHelper.convertToObjectId(expanded)
-    }
-
-    return output
+    // Then convert every value deeply
+    return MongoDBHelper.convertToObjectId(expanded)
   }
-
 
   public static expandDottedObject(obj: Record<string, unknown>): Record<string, unknown> {
     let result: Record<string, unknown> = {}
 
     for (const [key, value] of Object.entries(obj)) {
       if (key.startsWith('filter.') && key.includes('.')) {
-        const subKey = key.replace(/^filter\./, '')
+        const rest = key.substring('filter.'.length)
+
         const fragment = {
           filter: {
-            [subKey]: value
+            [rest]: value
           }
         }
 
         result = deepMerge(result, fragment)
-      } else {
-        result[key] = value
+        continue
       }
+
+      if (key.includes('.')) {
+        const fragment = expandDottedKey(key, value)
+        result = deepMerge(result, fragment)
+        continue
+      }
+
+      result[key] = value
     }
 
     return result
   }
-
 
   public static convertToObjectId(input: unknown): unknown {
     if (input === null || input === undefined) return input
@@ -208,7 +212,6 @@ export class MongoDBHelper {
 
     return input
   }
-
 
   /**
    * Recursively converts all ObjectId instances within a structure to strings.
