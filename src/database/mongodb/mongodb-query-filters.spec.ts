@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'bun:test'
 
-import { addNumberFilter, addRegexFilter, parseComparisons } from './mongodb-query-filters'
+import { addExactFilter, addNumberFilter, addRegexFilter, parseComparisons } from './mongodb-query-filters'
 
 describe('addRegexFilter', () => {
   it('adds regex filter when value is provided', () => {
@@ -12,6 +12,32 @@ describe('addRegexFilter', () => {
   it('does not add filter for empty or whitespace string', () => {
     const filters: Record<string, unknown>[] = []
     addRegexFilter(filters, 'name', '   ')
+    expect(filters).toEqual([])
+  })
+})
+
+describe('addExactFilter', () => {
+  it('adds exact match filter when value is provided', () => {
+    const filters: Record<string, unknown>[] = []
+    addExactFilter(filters, 'status', 'active')
+    expect(filters).toEqual([{ status: 'active' }])
+  })
+
+  it('trims value before adding filter', () => {
+    const filters: Record<string, unknown>[] = []
+    addExactFilter(filters, 'status', '  active  ')
+    expect(filters).toEqual([{ status: 'active' }])
+  })
+
+  it('does not add filter for empty string', () => {
+    const filters: Record<string, unknown>[] = []
+    addExactFilter(filters, 'status', '')
+    expect(filters).toEqual([])
+  })
+
+  it('does not add filter for whitespace-only string', () => {
+    const filters: Record<string, unknown>[] = []
+    addExactFilter(filters, 'status', '   ')
     expect(filters).toEqual([])
   })
 })

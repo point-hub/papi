@@ -532,3 +532,77 @@ describe('expandDottedObject', () => {
   })
 })
 
+describe('MongoDBHelper.stringToObjectId', () => {
+  it('1. Should convert valid string IDs to ObjectId instances in filter', () => {
+    const query = {
+      filter: {
+        _id: '64b8f0f2e1d3c8a1b2c3d4e5',
+        user_id: '64b8f0f2e1d3c8a1b2c3d4e6',
+        status: 'active'
+      }
+    }
+
+    const result = MongoDBHelper.stringToObjectId(query)
+
+    expect(result.filter._id).toBeInstanceOf(ObjectId)
+    expect(result.filter.user_id).toBeInstanceOf(ObjectId)
+    expect(result.filter.status).toBe('active')
+  })
+
+  it('2. Should leave non-string ID fields unchanged', () => {
+    const query = {
+      filter: {
+        _id: 12345,
+        user_id: null,
+        status: 'inactive'
+      }
+    }
+
+    const result = MongoDBHelper.stringToObjectId(query)
+
+    expect(result.filter._id).toBe(12345)
+    expect(result.filter.user_id).toBeNull()
+    expect(result.filter.status).toBe('inactive')
+  })
+
+  it('3. Should handle mixed valid and invalid string IDs', () => {
+    const query = {
+      filter: {
+        _id: '64b8f0f2e1d3c8a1b2c3d4e5', // valid
+        user_id: 'invalidObjectIdString', // invalid
+        group_id: '64b8f0f2e1d3c8a1b2c3d4e7' // valid
+      }
+    }
+
+    const result = MongoDBHelper.stringToObjectId(query)
+
+    expect(result.filter._id).toBeInstanceOf(ObjectId)
+    expect(result.filter.user_id).toBe('invalidObjectIdString')
+    expect(result.filter.group_id).toBeInstanceOf(ObjectId)
+  })
+
+  it('4. Should return the original query if no filter is present', () => {
+    const query = {
+      sort: { created_at: -1 },
+      limit: 10
+    }
+
+    const result = MongoDBHelper.stringToObjectId(query)
+
+    expect(result).toEqual(query)
+  })
+
+  it('5. Should not modify the original query object', () => {
+    const query = {
+      filter: {
+        _id: '64b8f0f2e1d3c8a1b2c3d4e5'
+      }
+    }
+
+    const queryCopy = JSON.parse(JSON.stringify(query))
+
+    MongoDBHelper.stringToObjectId(query)
+
+    expect(query).toEqual(queryCopy)
+  })
+})

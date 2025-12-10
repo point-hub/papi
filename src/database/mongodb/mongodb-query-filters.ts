@@ -14,6 +14,19 @@ export const addRegexFilter = (filters: Record<string, unknown>[], field: string
 }
 
 /**
+ * Adds an exact-match filter to the filters array if a value is provided.
+ *
+ * @param filters - An array of MongoDB filter objects to be modified.
+ * @param field - The field name to match exactly.
+ * @param value - The exact value to match (optional). If empty or only whitespace, no filter is added.
+ */
+export const addExactFilter = (filters: Record<string, unknown>[], field: string, value?: string) => {
+  if (value?.trim()) {
+    filters.push({ [field]: value.trim() })
+  }
+}
+
+/**
  * Adds a numeric filter to the filters array based on comparison operators or a single value.
  *
  * Accepts expressions like `">10<20"`, `"<=15"`, `"=5"` or `"50"` (interpreted as equality).
