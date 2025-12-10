@@ -129,5 +129,6 @@ export const parseComparisons = (
 export default {
   parseComparisons,
   addNumberFilter,
-  addRegexFilter
+  addRegexFilter,
+  addExactFilter
 }
