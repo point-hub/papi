@@ -347,53 +347,55 @@ export class MongoDBHelper {
    * It flattens nested objects into dot notation and handles explicit null values for $unset.
    * Undefined values are ignored.
    */
-  public static buildPatchData = (rawInput: Record<string, any>): { $set?: Record<string, any>, $unset?: Record<string, true> } => {
+  public static buildPatchData = (rawInput: Record<string, any>): { $set?: Record<string, any>, $unset?: Record<string, true>, $push?: Record<string, any>, $pull?: Record<string, any>, } => {
     const setOperations: Record<string, any> = {}
     const unsetOperations: Record<string, true> = {}
-
+    const pushOperations: Record<string, any> = {}
+    const pullOperations: Record<string, any> = {}
     /**
      * Recursively traverses the object and populates $set/$unset operations.
      */
     const flattenAndSeparate = (obj: Record<string, any>, prefix: string = '') => {
       for (const key in obj) {
-        if (!Object.prototype.hasOwnProperty.call(obj, key)) {
-          continue
-        }
-
         const currentKey = prefix + key
         const value = obj[key]
 
-        if (value === undefined) {
-          // Ignore undefined values.
-          continue
+        if (value === undefined) continue
 
-        } else if (value === null) {
-          // Use null to signal field removal via $unset.
+        if (value === null) {
           unsetOperations[currentKey] = true
+          continue
+        }
 
-        } else if (
+        if (isType(value, 'object') && value.$push !== undefined) {
+          pushOperations[currentKey] = value.$push
+          continue
+        }
+
+        if (isType(value, 'object') && value.$pull !== undefined) {
+          pullOperations[currentKey] = value.$pull
+          continue
+        }
+
+        if (
           isType(value, 'object') &&
-          value !== null &&
           !Array.isArray(value) &&
           !isType(value, 'date') &&
-          !isType(value, 'function') &&
           !(value instanceof ObjectId)
         ) {
-          // Recurse into non-null, non-array objects.
           flattenAndSeparate(value, currentKey + '.')
-
         } else {
-          // Primitive value or Array: Add to $set.
           setOperations[currentKey] = value
         }
       }
+
     }
 
     // Start processing from the top level
     flattenAndSeparate(rawInput)
 
     // Assemble and return the final update document
-    const updateDoc: { $set?: Record<string, any>, $unset?: Record<string, true> } = {}
+    const updateDoc: any = {}
 
     if (Object.keys(setOperations).length > 0) {
       updateDoc.$set = setOperations
@@ -401,6 +403,14 @@ export class MongoDBHelper {
 
     if (Object.keys(unsetOperations).length > 0) {
       updateDoc.$unset = unsetOperations
+    }
+
+    if (Object.keys(pushOperations).length > 0) {
+      updateDoc.$push = pushOperations
+    }
+
+    if (Object.keys(pullOperations).length > 0) {
+      updateDoc.$pull = pullOperations
     }
 
     return updateDoc

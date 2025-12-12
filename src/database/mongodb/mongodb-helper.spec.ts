@@ -422,6 +422,94 @@ describe('MongoDBHelper.buildPatchData', () => {
       }
     })
   })
+
+  it('9. Should correctly handle $push operations', () => {
+    const rawInput = {
+      tags: { $push: 'new-tag' }, // push single value
+      history: {
+        logs: { $push: { action: 'login' } } // nested push
+      },
+      list: { $push: { $each: [1, 2, 3] } } // push with $each
+    }
+
+    const result = MongoDBHelper.buildPatchData(rawInput)
+
+    expect(result).toEqual({
+      $push: {
+        'tags': 'new-tag',
+        'history.logs': { action: 'login' },
+        'list': { $each: [1, 2, 3] }
+      }
+    })
+  })
+
+  it('10. Should correctly handle $pull operations', () => {
+    const rawInput = {
+      tags: { $pull: 'remove-me' }, // pull single value
+      history: {
+        logs: { $pull: { action: 'logout' } } // nested pull
+      },
+      roles: { $pull: { $in: ['guest', 'temp'] } } // pull multiple values
+    }
+
+    const result = MongoDBHelper.buildPatchData(rawInput)
+
+    expect(result).toEqual({
+      $pull: {
+        'tags': 'remove-me',
+        'history.logs': { action: 'logout' },
+        'roles': { $in: ['guest', 'temp'] }
+      }
+    })
+  })
+
+  it('11. Should mix $set, $unset, $push, and $pull correctly', () => {
+    const rawInput = {
+      name: 'Alice',                     // $set
+      email: null,                       // $unset
+      tags: { $push: 'new' },            // $push
+      roles: { $pull: 'guest' },         // $pull
+      meta: {
+        active: true,                    // $set
+        removed: null                    // $unset
+      }
+    }
+
+    const result = MongoDBHelper.buildPatchData(rawInput)
+
+    expect(result).toEqual({
+      $set: {
+        name: 'Alice',
+        'meta.active': true
+      },
+      $unset: {
+        email: true,
+        'meta.removed': true
+      },
+      $push: {
+        tags: 'new'
+      },
+      $pull: {
+        roles: 'guest'
+      }
+    })
+  })
+
+  it('12. Should ignore undefined inside $push and $pull', () => {
+    const rawInput = {
+      tags: { $push: undefined },  // ignore
+      roles: { $pull: undefined }, // ignore
+      other: 'ok'
+    }
+
+    const result = MongoDBHelper.buildPatchData(rawInput)
+
+    expect(result).toEqual({
+      $set: {
+        other: 'ok'
+      }
+    })
+  })
 })
 
 describe('expandDottedObject', () => {
