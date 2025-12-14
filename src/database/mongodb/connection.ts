@@ -302,19 +302,29 @@ export class MongoDBConnection implements IDatabase {
     return { deleted_count: result.deletedCount }
   }
 
-  public async deleteMany(_ids: string[], options?: any): Promise<IDeleteManyOutput> {
+  public async deleteMany(input: string[] | Record<string, any>, options?: any): Promise<IDeleteManyOutput> {
     if (!this._collection) {
       throw new Error('Collection not found')
+    }
+
+    let filter: Record<string, any>
+
+    if (Array.isArray(input)) {
+      filter = {
+        _id: {
+          $in: MongoDBHelper.stringToObjectId(input)
+        }
+      }
+    } else if (typeof input === 'object' && input !== null) {
+      filter = input
+    } else {
+      throw new Error('Invalid deleteMany input')
     }
 
     const deleteOptions = options as DeleteOptions
 
     const result = await this._collection.deleteMany(
-      {
-        _id: {
-          $in: MongoDBHelper.stringToObjectId(_ids)
-        }
-      },
+      filter,
       deleteOptions
     )
 

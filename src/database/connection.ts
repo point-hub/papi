@@ -85,8 +85,8 @@ export class DatabaseConnection implements IDatabase {
   public async delete(_id: string, options?: unknown): Promise<IDeleteOutput> {
     return await this.adapter.delete(_id, options)
   }
-  public async deleteMany(_ids: string[], options?: unknown): Promise<IDeleteManyOutput> {
-    return await this.adapter.deleteMany(_ids, options)
+  public async deleteMany(input: string[] | Record<string, unknown>, options?: unknown): Promise<IDeleteManyOutput> {
+    return await this.adapter.deleteMany(input, options)
   }
   public async deleteAll(options?: unknown): Promise<IDeleteManyOutput> {
     return await this.adapter.deleteAll(options)
