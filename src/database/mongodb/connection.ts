@@ -316,7 +316,7 @@ export class MongoDBConnection implements IDatabase {
         }
       }
     } else if (typeof input === 'object' && input !== null) {
-      filter = input
+      filter = MongoDBHelper.stringToObjectId(input)
     } else {
       throw new Error('Invalid deleteMany input')
     }
