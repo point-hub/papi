@@ -50,6 +50,15 @@ export class DatabaseTestUtil {
     }
   }
 
+  static async dropAllCollections() {
+    const collections = await DatabaseTestUtil.dbConnection.listCollections()
+
+    for (const collection of collections) {
+      console.info(`[drop] ${collection.name}`)
+      await DatabaseTestUtil.dbConnection.dropCollection(collection.name)
+    }
+  }
+
   static async reset() {
     const collections = await DatabaseTestUtil.dbConnection.listCollections()
     for (const collection of collections) {
