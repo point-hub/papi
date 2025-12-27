@@ -177,6 +177,7 @@ export interface IDatabase {
   createIndex(name: string, spec: unknown, options?: unknown): Promise<void>
   createCollection(name: string, options?: unknown): Promise<void>
   dropCollection(name: string, options?: unknown): Promise<void>
+  dropDatabase(options?: unknown): Promise<void>
   updateSchema(name: string, schema: unknown): Promise<void>
   command(document: IDocument, options?: unknown): Promise<IDocument>
   create(document: IDocument, options?: unknown): Promise<ICreateOutput>

@@ -123,6 +123,14 @@ export class MongoDBConnection implements IDatabase {
     await this._database.dropCollection(name, options)
   }
 
+  public async dropDatabase(options: any): Promise<void> {
+    if (!this._database) {
+      throw new Error('Database not found')
+    }
+
+    await this._database.dropDatabase(options)
+  }
+
   public startSession() {
     this.session = this.client.startSession()
     return this.session

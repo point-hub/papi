@@ -58,6 +58,9 @@ export class DatabaseConnection implements IDatabase {
   public async dropCollection(name: string, options?: unknown) {
     await this.adapter.dropCollection(name, options)
   }
+  public async dropDatabase(options?: unknown) {
+    await this.adapter.dropDatabase(options)
+  }
   public async updateSchema(name: string, schema: unknown) {
     await this.adapter.updateSchema(name, schema)
   }
