@@ -36,8 +36,8 @@ export interface IMiddleware {
 /**
  * Repository
  */
-export interface IAggregateRepository {
-  handle(filter: IDocument, options?: unknown): Promise<IAggregateOutput>
+export interface IAggregateRepository<TData> {
+  handle(filter: IDocument, options?: unknown): Promise<IAggregateOutput<TData>>
 }
 
 export interface ICreateManyRepository {
@@ -56,12 +56,12 @@ export interface IDeleteRepository {
   handle(_id: string, options?: unknown): Promise<IDeleteOutput>
 }
 
-export interface IRetrieveAllRepository {
-  handle(query: IQuery, options?: unknown): Promise<IRetrieveAllOutput>
+export interface IRetrieveAllRepository<TData> {
+  handle(query: IQuery, options?: unknown): Promise<TData>
 }
 
-export interface IRetrieveRepository {
-  handle(_id: string, options?: unknown): Promise<IRetrieveOutput>
+export interface IRetrieveRepository<TOutput extends object> {
+  handle(_id: string, options?: unknown): Promise<TOutput>
 }
 
 export interface IUpdateManyRepository {
@@ -103,18 +103,11 @@ export interface IPipeline {
 
 export interface ICreateOutput {
   inserted_id: string
-  [key: string]: unknown
 }
 
 export interface ICreateManyOutput {
   inserted_count: number
   inserted_ids: string[]
-  [key: string]: unknown
-}
-
-export interface IRetrieveOutput {
-  _id: string
-  [key: string]: unknown
 }
 
 export interface IPagination {
@@ -124,38 +117,32 @@ export interface IPagination {
   total_document: number
 }
 
-export interface IRetrieveAllOutput {
-  data: IRetrieveOutput[]
+export interface IRetrieveAllOutput<TData> {
+  data: TData[]
   pagination: IPagination
-  [key: string]: unknown
 }
 
 export interface IUpdateOutput {
   matched_count: number
   modified_count: number
-  [key: string]: unknown
 }
 
 export interface IUpdateManyOutput {
   matched_count: number
   modified_count: number
-  [key: string]: unknown
 }
 
 export interface IDeleteOutput {
   deleted_count: number
-  [key: string]: unknown
 }
 
 export interface IDeleteManyOutput {
   deleted_count: number
-  [key: string]: unknown
 }
 
-export interface IAggregateOutput {
-  data: { [key: string]: unknown }[]
+export interface IAggregateOutput<TData> {
+  data: TData[]
   pagination: IPagination
-  [key: string]: unknown
 }
 
 // Todo: declare own client session
@@ -182,14 +169,14 @@ export interface IDatabase {
   command(document: IDocument, options?: unknown): Promise<IDocument>
   create(document: IDocument, options?: unknown): Promise<ICreateOutput>
   createMany(documents: IDocument[], options?: unknown): Promise<ICreateManyOutput>
-  retrieveAll(query: IQuery, options?: unknown): Promise<IRetrieveAllOutput>
-  retrieve(_id: string, options?: unknown): Promise<IRetrieveOutput | null>
+  retrieveAll<TData>(query: IQuery, options?: unknown): Promise<IRetrieveAllOutput<TData>>
+  retrieve<TOutput extends object>(_id: string, options?: unknown): Promise<TOutput | null>
   update(_id: string, document: IDocument, options?: unknown): Promise<IUpdateOutput>
   updateMany(filter: IDocument, document: IDocument, options?: unknown): Promise<IUpdateManyOutput>
   delete(_id: string, options?: unknown): Promise<IDeleteOutput>
   deleteMany(input: string[] | Record<string, unknown>, options?: unknown): Promise<IDeleteManyOutput>
   deleteAll(options?: unknown): Promise<IDeleteManyOutput>
-  aggregate(pipeline?: IPipeline[], query?: IQuery, options?: unknown): Promise<IAggregateOutput>
+  aggregate<TData>(pipeline?: IPipeline[], query?: IQuery, options?: unknown): Promise<IAggregateOutput<TData>>
 }
 /**
  * Express App

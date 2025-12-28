@@ -30,7 +30,6 @@ import {
   IPipeline,
   IQuery,
   IRetrieveAllOutput,
-  IRetrieveOutput,
   IUpdateManyOutput,
   IUpdateOutput
 } from '../../index'
@@ -197,7 +196,7 @@ export class MongoDBConnection implements IDatabase {
     }
   }
 
-  public async retrieveAll(query: IQuery, options?: any): Promise<IRetrieveAllOutput> {
+  public async retrieveAll<TData>(query: IQuery, options?: any): Promise<IRetrieveAllOutput<TData>> {
     if (!this._collection) {
       throw new Error('Collection not found')
     }
@@ -226,7 +225,7 @@ export class MongoDBConnection implements IDatabase {
     const result = await cursor.toArray()
 
     return {
-      data: MongoDBHelper.objectIdToString(result) as unknown[] as IRetrieveOutput[],
+      data: MongoDBHelper.objectIdToString(result) as TData[],
       pagination: {
         page: Querystring.page(query.page),
         page_count: Math.ceil(totalDocument / Querystring.limit(query.page_size)),
@@ -236,7 +235,7 @@ export class MongoDBConnection implements IDatabase {
     }
   }
 
-  public async retrieve(_id: string, options?: any): Promise<IRetrieveOutput | null> {
+  public async retrieve<TOutput extends object>(_id: string, options?: any): Promise<TOutput | null> {
     if (!this._collection) {
       throw new Error('Collection not found')
     }
@@ -250,7 +249,7 @@ export class MongoDBConnection implements IDatabase {
       retrieveOptions
     )
 
-    return MongoDBHelper.objectIdToString(result)
+    return MongoDBHelper.objectIdToString(result) as TOutput
   }
 
   public async update(_id: string, document: IDocument, options?: any): Promise<IUpdateOutput> {
@@ -351,7 +350,7 @@ export class MongoDBConnection implements IDatabase {
     return { deleted_count: result.deletedCount }
   }
 
-  public async aggregate(pipeline: IPipeline[], query?: IQuery, options?: any): Promise<IAggregateOutput> {
+  public async aggregate<TData>(pipeline: IPipeline[], query?: IQuery, options?: any): Promise<IAggregateOutput<TData>> {
     if (!this._collection) {
       throw new Error('Collection not found')
     }

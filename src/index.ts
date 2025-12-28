@@ -82,7 +82,6 @@ export type {
   IQuery,
   IRetrieveAllOutput,
   IRetrieveAllRepository,
-  IRetrieveOutput,
   IRetrieveRepository,
   ISchema,
   ISchemaValidation,

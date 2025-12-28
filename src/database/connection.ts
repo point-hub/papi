@@ -9,7 +9,6 @@ import {
   IPipeline,
   IQuery,
   IRetrieveAllOutput,
-  IRetrieveOutput,
   IUpdateManyOutput,
   IUpdateOutput
 } from '../index'
@@ -73,10 +72,10 @@ export class DatabaseConnection implements IDatabase {
   public async createMany(documents: IDocument[], options?: unknown): Promise<ICreateManyOutput> {
     return await this.adapter.createMany(documents, options)
   }
-  public async retrieveAll(query: IQuery, options?: unknown): Promise<IRetrieveAllOutput> {
+  public async retrieveAll<TData>(query: IQuery, options?: unknown): Promise<IRetrieveAllOutput<TData>> {
     return await this.adapter.retrieveAll(query, options)
   }
-  public async retrieve(_id: string, options?: unknown): Promise<IRetrieveOutput | null> {
+  public async retrieve<TOutput extends object>(_id: string, options?: unknown): Promise<TOutput | null> {
     return await this.adapter.retrieve(_id, options)
   }
   public async update(_id: string, document: IDocument, options?: unknown): Promise<IUpdateOutput> {
@@ -94,7 +93,7 @@ export class DatabaseConnection implements IDatabase {
   public async deleteAll(options?: unknown): Promise<IDeleteManyOutput> {
     return await this.adapter.deleteAll(options)
   }
-  public async aggregate(pipeline: IPipeline[], query?: IQuery, options?: unknown): Promise<IAggregateOutput> {
+  public async aggregate<TData>(pipeline: IPipeline[], query?: IQuery, options?: unknown): Promise<IAggregateOutput<TData>> {
     return await this.adapter.aggregate(pipeline, query, options)
   }
 }
