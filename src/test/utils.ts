@@ -66,11 +66,11 @@ export class DatabaseTestUtil {
     }
   }
 
-  static async retrieve(collection: string, _id: string) {
-    return await DatabaseTestUtil.dbConnection.collection(collection).retrieve(_id)
+  static async retrieve<TOutput extends object>(collection: string, _id: string) {
+    return await DatabaseTestUtil.dbConnection.collection(collection).retrieve<TOutput>(_id)
   }
 
-  static async retrieveAll(collection: string, query: IQuery = {}) {
-    return await DatabaseTestUtil.dbConnection.collection(collection).retrieveAll(query)
+  static async retrieveAll<TData>(collection: string, query: IQuery = {}) {
+    return await DatabaseTestUtil.dbConnection.collection(collection).retrieveAll<TData>(query)
   }
 }
