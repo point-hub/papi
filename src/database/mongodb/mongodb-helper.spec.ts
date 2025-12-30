@@ -510,6 +510,82 @@ describe('MongoDBHelper.buildPatchData', () => {
       }
     })
   })
+
+  it('13. Should build $inc operator', () => {
+    const input = {
+      counter: { $inc: 1 }
+    }
+
+    const result = MongoDBHelper.buildPatchData(input)
+
+    expect(result).toEqual({
+      $inc: {
+        counter: 1
+      }
+    })
+  })
+
+  it('14. Should build $addToSet operator', () => {
+    const input = {
+      tags: { $addToSet: 'admin' }
+    }
+
+    const result = MongoDBHelper.buildPatchData(input)
+
+    expect(result).toEqual({
+      $addToSet: {
+        tags: 'admin'
+      }
+    })
+  })
+
+  it('15. Should support nested $inc paths', () => {
+    const input = {
+      stats: {
+        views: { $inc: 2 }
+      }
+    }
+
+    const result = MongoDBHelper.buildPatchData(input)
+
+    expect(result).toEqual({
+      $inc: {
+        'stats.views': 2
+      }
+    })
+  })
+
+  it('16. Should merge $inc with $set safely', () => {
+    const input = {
+      name: 'Example',
+      counter: { $inc: 1 }
+    }
+
+    const result = MongoDBHelper.buildPatchData(input)
+
+    expect(result).toEqual({
+      $set: {
+        name: 'Example'
+      },
+      $inc: {
+        counter: 1
+      }
+    })
+  })
+
+  it('17. Should support $addToSet with $each', () => {
+    const input = {
+      tags: { $addToSet: { $each: ['admin', 'user'] } }
+    }
+
+    const result = MongoDBHelper.buildPatchData(input)
+
+    expect(result).toEqual({
+      $addToSet: {
+        tags: { $each: ['admin', 'user'] }
+      }
+    })
+  })
 })
 
 describe('expandDottedObject', () => {
