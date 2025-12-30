@@ -171,7 +171,7 @@ export interface IDatabase {
   createMany(documents: IDocument[], options?: unknown): Promise<ICreateManyOutput>
   retrieveAll<TData>(query: IQuery, options?: unknown): Promise<IRetrieveAllOutput<TData>>
   retrieve<TOutput extends object>(_id: string, options?: unknown): Promise<TOutput | null>
-  update(_id: string, document: IDocument, options?: unknown): Promise<IUpdateOutput>
+  update(filter: string | IDocument, document: IDocument, options?: unknown): Promise<IUpdateOutput>
   updateMany(filter: IDocument, document: IDocument, options?: unknown): Promise<IUpdateManyOutput>
   delete(_id: string, options?: unknown): Promise<IDeleteOutput>
   deleteMany(input: string[] | Record<string, unknown>, options?: unknown): Promise<IDeleteManyOutput>

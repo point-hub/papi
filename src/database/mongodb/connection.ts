@@ -252,7 +252,7 @@ export class MongoDBConnection implements IDatabase {
     return MongoDBHelper.objectIdToString(result) as TOutput
   }
 
-  public async update(_id: string, document: IDocument, options?: any): Promise<IUpdateOutput> {
+  public async update(filter: string | IDocument, document: IDocument, options?: any): Promise<IUpdateOutput> {
     if (!this._collection) {
       throw new Error('Collection not found')
     }
@@ -260,8 +260,12 @@ export class MongoDBConnection implements IDatabase {
     const updateOptions = options as UpdateOptions
     const buildPatchData = MongoDBHelper.buildPatchData(document)
 
+    if (typeof filter === 'string'){
+      filter = { _id: filter }
+    }
+
     const result = await this._collection.updateOne(
-      { _id: new ObjectId(_id) },
+      MongoDBHelper.stringToObjectId(filter),
       MongoDBHelper.stringToObjectId(buildPatchData),
       updateOptions
     )
