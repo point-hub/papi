@@ -347,11 +347,21 @@ export class MongoDBHelper {
    * It flattens nested objects into dot notation and handles explicit null values for $unset.
    * Undefined values are ignored.
    */
-  public static buildPatchData = (rawInput: Record<string, any>): { $set?: Record<string, any>, $unset?: Record<string, true>, $push?: Record<string, any>, $pull?: Record<string, any>, } => {
+  public static buildPatchData = (rawInput: Record<string, any>): {
+    $set?: Record<string, any>,
+    $unset?: Record<string, true>,
+    $push?: Record<string, any>,
+    $pull?: Record<string, any>,
+    $inc?: Record<string, number>;
+    $addToSet?: Record<string, any>;
+  } => {
     const setOperations: Record<string, any> = {}
     const unsetOperations: Record<string, true> = {}
     const pushOperations: Record<string, any> = {}
     const pullOperations: Record<string, any> = {}
+    const incOperations: Record<string, number> = {}
+    const addToSetOperations: Record<string, any> = {}
+
     /**
      * Recursively traverses the object and populates $set/$unset operations.
      */
@@ -367,14 +377,26 @@ export class MongoDBHelper {
           continue
         }
 
-        if (isType(value, 'object') && value.$push !== undefined) {
-          pushOperations[currentKey] = value.$push
-          continue
-        }
+        if (isType(value, 'object')) {
+          if (value.$push !== undefined) {
+            pushOperations[currentKey] = value.$push
+            continue
+          }
 
-        if (isType(value, 'object') && value.$pull !== undefined) {
-          pullOperations[currentKey] = value.$pull
-          continue
+          if (value.$pull !== undefined) {
+            pullOperations[currentKey] = value.$pull
+            continue
+          }
+
+          if (value.$inc !== undefined) {
+            incOperations[currentKey] = value.$inc
+            continue
+          }
+
+          if (value.$addToSet !== undefined) {
+            addToSetOperations[currentKey] = value.$addToSet
+            continue
+          }
         }
 
         if (
@@ -397,21 +419,12 @@ export class MongoDBHelper {
     // Assemble and return the final update document
     const updateDoc: any = {}
 
-    if (Object.keys(setOperations).length > 0) {
-      updateDoc.$set = setOperations
-    }
-
-    if (Object.keys(unsetOperations).length > 0) {
-      updateDoc.$unset = unsetOperations
-    }
-
-    if (Object.keys(pushOperations).length > 0) {
-      updateDoc.$push = pushOperations
-    }
-
-    if (Object.keys(pullOperations).length > 0) {
-      updateDoc.$pull = pullOperations
-    }
+    if (Object.keys(setOperations).length > 0) { updateDoc.$set = setOperations }
+    if (Object.keys(unsetOperations).length > 0) { updateDoc.$unset = unsetOperations }
+    if (Object.keys(pushOperations).length > 0) { updateDoc.$push = pushOperations }
+    if (Object.keys(pullOperations).length > 0) { updateDoc.$pull = pullOperations }
+    if (Object.keys(incOperations).length > 0) { updateDoc.$inc = incOperations }
+    if (Object.keys(addToSetOperations).length > 0) { updateDoc.$addToSet = addToSetOperations }
 
     return updateDoc
   }
