@@ -9,6 +9,7 @@ import {
   IPipeline,
   IQuery,
   IRetrieveAllOutput,
+  IRetrieveManyOutput,
   IUpdateManyOutput,
   IUpdateOutput
 } from '../index'
@@ -74,6 +75,9 @@ export class DatabaseConnection implements IDatabase {
   }
   public async retrieveAll<TData>(query: IQuery, options?: unknown): Promise<IRetrieveAllOutput<TData>> {
     return await this.adapter.retrieveAll(query, options)
+  }
+  public async retrieveMany<TData>(query: IQuery, options?: unknown): Promise<IRetrieveManyOutput<TData>> {
+    return await this.adapter.retrieveMany(query, options)
   }
   public async retrieve<TOutput extends object>(_id: string, options?: unknown): Promise<TOutput | null> {
     return await this.adapter.retrieve(_id, options)

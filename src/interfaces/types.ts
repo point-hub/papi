@@ -56,7 +56,14 @@ export interface IDeleteRepository {
   handle(_id: string, options?: unknown): Promise<IDeleteOutput>
 }
 
+/**
+ * @deprecated
+ */
 export interface IRetrieveAllRepository<TData> {
+  handle(query: IQuery, options?: unknown): Promise<TData>
+}
+
+export interface IRetrieveManyRepository<TData> {
   handle(query: IQuery, options?: unknown): Promise<TData>
 }
 
@@ -117,7 +124,15 @@ export interface IPagination {
   total_document: number
 }
 
+/**
+ * @deprecated
+ */
 export interface IRetrieveAllOutput<TData> {
+  data: TData[]
+  pagination: IPagination
+}
+
+export interface IRetrieveManyOutput<TData> {
   data: TData[]
   pagination: IPagination
 }
@@ -170,6 +185,7 @@ export interface IDatabase {
   create(document: IDocument, options?: unknown): Promise<ICreateOutput>
   createMany(documents: IDocument[], options?: unknown): Promise<ICreateManyOutput>
   retrieveAll<TData>(query: IQuery, options?: unknown): Promise<IRetrieveAllOutput<TData>>
+  retrieveMany<TData>(query: IQuery, options?: unknown): Promise<IRetrieveManyOutput<TData>>
   retrieve<TOutput extends object>(_id: string, options?: unknown): Promise<TOutput | null>
   update(filter: string | IDocument, document: IDocument, options?: unknown): Promise<IUpdateOutput>
   updateMany(filter: IDocument, document: IDocument, options?: unknown): Promise<IUpdateManyOutput>

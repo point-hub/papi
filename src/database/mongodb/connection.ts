@@ -30,6 +30,7 @@ import {
   IPipeline,
   IQuery,
   IRetrieveAllOutput,
+  IRetrieveManyOutput,
   IUpdateManyOutput,
   IUpdateOutput
 } from '../../index'
@@ -197,6 +198,45 @@ export class MongoDBConnection implements IDatabase {
   }
 
   public async retrieveAll<TData>(query: IQuery, options?: any): Promise<IRetrieveAllOutput<TData>> {
+    if (!this._collection) {
+      throw new Error('Collection not found')
+    }
+    const retrieveOptions = options as FindOptions
+
+    const transformedQuery = MongoDBHelper.stringToObjectId(query)
+
+    const filter = transformedQuery?.filter ?? {}
+
+    const cursor = this._collection
+      .find(filter, retrieveOptions)
+      .limit(Querystring.limit(query.page_size))
+      .skip(Querystring.skip(Querystring.page(query.page), Querystring.limit(query.page_size)))
+
+    const sort = Querystring.sort(query.sort ?? '')
+    if (!isEmpty(sort)) {
+      cursor.sort(sort)
+    }
+    const fields = Querystring.fields(query.fields ?? '', query.exclude_fields ?? [])
+    if (!isEmpty(fields)) {
+      cursor.project(fields)
+    }
+
+    const totalDocument = await this._collection.countDocuments(filter)
+
+    const result = await cursor.toArray()
+
+    return {
+      data: MongoDBHelper.objectIdToString(result) as TData[],
+      pagination: {
+        page: Querystring.page(query.page),
+        page_count: Math.ceil(totalDocument / Querystring.limit(query.page_size)),
+        page_size: Querystring.limit(query.page_size),
+        total_document: totalDocument
+      }
+    }
+  }
+
+  public async retrieveMany<TData>(query: IQuery, options?: any): Promise<IRetrieveManyOutput<TData>> {
     if (!this._collection) {
       throw new Error('Collection not found')
     }
