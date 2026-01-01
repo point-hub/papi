@@ -70,7 +70,7 @@ export class DatabaseTestUtil {
     return await DatabaseTestUtil.dbConnection.collection(collection).retrieve<TOutput>(_id)
   }
 
-  static async retrieveAll<TData>(collection: string, query: IQuery = {}) {
-    return await DatabaseTestUtil.dbConnection.collection(collection).retrieveAll<TData>(query)
+  static async retrieveMany<TData>(collection: string, query: IQuery = {}) {
+    return await DatabaseTestUtil.dbConnection.collection(collection).retrieveMany<TData>(query)
   }
 }
