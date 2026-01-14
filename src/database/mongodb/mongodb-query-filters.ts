@@ -27,7 +27,7 @@ export const addExactFilter = (filters: Record<string, unknown>[], field: string
 }
 
 export const addDateRangeFilter = (filters: Record<string, unknown>[], field: string, value_from?: string, value_to?: string) => {
-  if (value_from?.trim() && value_to?.trim()) {
+  if (value_from?.trim() || value_to?.trim()) {
     const range: Record<string, unknown> = {}
     if (value_from?.trim()) {
       range['$gte'] = new Date(value_from?.trim())
