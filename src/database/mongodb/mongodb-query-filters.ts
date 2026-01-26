@@ -62,7 +62,9 @@ export const parseBoolean = (value?: string | boolean): boolean | undefined => {
  * @param value - A boolean or string (`"true"` / `"false"`) to match.
  */
 export const addBooleanFilter = (filters: Record<string, unknown>[], field: string, value?: string | boolean) => {
-  filters.push({ [field]: parseBoolean(value) })
+  if (value?.toString().trim()) {
+    filters.push({ [field]: parseBoolean(value) })
+  }
 }
 
 /**
