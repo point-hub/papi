@@ -191,6 +191,7 @@ export const parseComparisons = (
 
 export default {
   parseComparisons,
+  addBooleanFilter,
   addNumberFilter,
   addRegexFilter,
   addDateRangeFilter,
