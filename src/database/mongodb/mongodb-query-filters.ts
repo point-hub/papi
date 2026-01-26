@@ -26,6 +26,56 @@ export const addExactFilter = (filters: Record<string, unknown>[], field: string
   }
 }
 
+/**
+ * Parses a boolean value from a string or boolean input.
+ *
+ * - Accepts `true` / `false` booleans directly
+ * - Converts string values `"true"` and `"false"` to booleans
+ * - Returns `undefined` for any other value
+ *
+ * @param value - A boolean or a string representation of a boolean.
+ * @returns `true`, `false`, or `undefined` if the value cannot be parsed.
+ */
+export const parseBoolean = (value?: string | boolean): boolean | undefined => {
+  if (typeof value === 'boolean') {
+    return value
+  }
+
+  if (value === 'true') {
+    return true
+  }
+  if (value === 'false') {
+    return false
+  }
+
+  return undefined
+}
+
+/**
+ * Adds a boolean exact-match filter to the filters array.
+ *
+ * The filter is only added if the value can be successfully parsed
+ * into a boolean (`true` or `false`).
+ *
+ * @param filters - An array of MongoDB filter objects to be modified.
+ * @param field - The field name to match.
+ * @param value - A boolean or string (`"true"` / `"false"`) to match.
+ */
+export const addBooleanFilter = (filters: Record<string, unknown>[], field: string, value?: string | boolean) => {
+  filters.push({ [field]: parseBoolean(value) })
+}
+
+/**
+ * Adds a MongoDB date range filter (`$gte` / `$lte`) to the filters array.
+ *
+ * The filter is only added if at least one of `value_from` or `value_to`
+ * is provided and non-empty.
+ *
+ * @param filters - An array of MongoDB filter objects to be modified.
+ * @param field - The date field name to apply the range filter on.
+ * @param value_from - The start date (inclusive) as a string.
+ * @param value_to - The end date (inclusive) as a string.
+ */
 export const addDateRangeFilter = (filters: Record<string, unknown>[], field: string, value_from?: string, value_to?: string) => {
   if (value_from?.trim() || value_to?.trim()) {
     const range: Record<string, unknown> = {}
