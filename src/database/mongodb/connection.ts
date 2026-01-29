@@ -43,6 +43,8 @@ export class MongoDBConnection implements IDatabase {
   public _collection: Collection | undefined
   public session: ClientSession | undefined
 
+  private isConnected = false
+
   constructor(
     connectionString: string,
     public databaseName: string
@@ -53,15 +55,23 @@ export class MongoDBConnection implements IDatabase {
     }
 
     this.client = new MongoClient(connectionString, options)
-    this.database(databaseName)
+
   }
 
   public async open() {
-    await this.client.connect()
+    if (!this.isConnected) {
+      await this.client.connect()
+      this.database(this.databaseName)
+      this.isConnected = true
+    }
   }
 
   public async close() {
-    await this.client.close()
+    if (this.isConnected) {
+      await this.client.close()
+      this._database = undefined
+      this.isConnected = false
+    }
   }
 
   public database(name: string, options?: DbOptions) {
@@ -307,6 +317,25 @@ export class MongoDBConnection implements IDatabase {
     const result = await this._collection.updateOne(
       MongoDBHelper.stringToObjectId(filter),
       MongoDBHelper.stringToObjectId(buildPatchData),
+      updateOptions
+    )
+
+    return {
+      modified_count: result.modifiedCount,
+      matched_count: result.matchedCount
+    }
+  }
+
+  public async updateOne(filter: IDocument, document: IDocument, options?: any): Promise<IUpdateOutput> {
+    if (!this._collection) {
+      throw new Error('Collection not found')
+    }
+
+    const updateOptions = options as UpdateOptions
+
+    const result = await this._collection.updateOne(
+      MongoDBHelper.stringToObjectId(filter),
+      MongoDBHelper.stringToObjectId(document),
       updateOptions
     )
 

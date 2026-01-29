@@ -85,6 +85,9 @@ export class DatabaseConnection implements IDatabase {
   public async update(filter: string | IDocument, document: IDocument, options?: unknown): Promise<IUpdateOutput> {
     return await this.adapter.update(filter, document, options)
   }
+  public async updateOne(filter: IDocument, document: IDocument, options?: unknown): Promise<IUpdateOutput> {
+    return await this.adapter.updateOne(filter, document, options)
+  }
   public async updateMany(filter: IDocument, document: IDocument, options?: unknown): Promise<IUpdateManyOutput> {
     return await this.adapter.updateMany(filter, document, options)
   }
