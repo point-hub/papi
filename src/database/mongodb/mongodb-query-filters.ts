@@ -1,5 +1,3 @@
-import { BaseErrorHandler } from '../..'
-
 /**
  * Adds a case-insensitive regex filter to the filters array if a value is provided.
  *
@@ -148,13 +146,17 @@ export const parseComparisons = (
   lte?: number
   eq?: number
 } => {
+  if (typeof expr !== 'string') return {}
+
   const cleanedExpr = expr.replace(/\s+/g, '')
 
-  if (/^\d+$/.test(cleanedExpr)) {
-    return { eq: parseInt(cleanedExpr, 10) }
+  // pure number (int or decimal)
+  if (/^-?\d+(?:\.\d+)?$/.test(cleanedExpr)) {
+    const value = Number(cleanedExpr)
+    return Number.isNaN(value) ? {} : { eq: value }
   }
 
-  const regex = /(<=|>=|<|>)(\d+)/g
+  const regex = /(<=|>=|<|>)(-?\d+(?:\.\d+)?)/g
   const result: Record<string, number> = {}
   let matchedStr = ''
   let hasLowerBound = false
@@ -163,30 +165,30 @@ export const parseComparisons = (
   let match
   while ((match = regex.exec(cleanedExpr)) !== null) {
     const [full, operator, valueStr] = match
-    const value = parseInt(valueStr, 10)
+    const value = Number(valueStr)
+    if (Number.isNaN(value)) return {}
+
     matchedStr += full
 
     switch (operator) {
     case '>':
     case '>=':
-      if (hasLowerBound)
-        throw new BaseErrorHandler.ApiError('Bad Request', { message: 'Only one lower-bound operator allowed.' })
+      if (hasLowerBound) return {}
       result[operator === '>' ? 'gt' : 'gte'] = value
       hasLowerBound = true
       break
+
     case '<':
     case '<=':
-      if (hasUpperBound)
-        throw new BaseErrorHandler.ApiError('Bad Request', { message: 'Only one upper-bound operator allowed.' })
+      if (hasUpperBound) return {}
       result[operator === '<' ? 'lt' : 'lte'] = value
       hasUpperBound = true
       break
     }
   }
 
-  if (cleanedExpr.length > 0 && matchedStr !== cleanedExpr) {
-    throw new BaseErrorHandler.ApiError('Bad Request', { message: `Malformed input: '${expr}' is not a number` })
-  }
+  // malformed input → silent fail
+  if (matchedStr !== cleanedExpr) return {}
 
   return result
 }

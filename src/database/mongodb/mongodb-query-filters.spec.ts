@@ -81,10 +81,10 @@ describe('parseComparisons', () => {
     expect(parseComparisons('>=15<=30')).toEqual({ gte: 15, lte: 30 })
   })
 
-  it('throws on malformed input', () => {
-    expect(() => parseComparisons('>>5')).toThrow()
-    expect(() => parseComparisons('abc')).toThrow()
-    expect(() => parseComparisons('>5>6')).toThrow()
-    expect(() => parseComparisons('<10<5')).toThrow()
+  it('silently fails on malformed input', () => {
+    expect(parseComparisons('>>5')).toEqual({})
+    expect(parseComparisons('abc')).toEqual({})
+    expect(parseComparisons('>5>6')).toEqual({})
+    expect(parseComparisons('<10<5')).toEqual({})
   })
 })
