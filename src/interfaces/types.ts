@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { NextFunction, Request, Response } from 'express'
+import type { Request, RequestHandler, Response } from 'express'
 import { ClientSession } from 'mongodb'
 /**
  * Controller
@@ -7,7 +7,6 @@ import { ClientSession } from 'mongodb'
 export interface IControllerInput {
   req: Request
   res: Response
-  next: NextFunction
   dbConnection: IDatabase
 }
 
@@ -20,19 +19,20 @@ export interface IControllerOutput {
   cookies?: any
   json?: any
 }
+
 /**
  * Middleware
  */
 export interface IMiddlewareInput {
   req: Request
   res: Response
-  next: NextFunction
   dbConnection: IDatabase
 }
 
-export interface IMiddleware {
-  (input: IMiddlewareInput): Promise<void>
-}
+export type IAppMiddleware = (input: IMiddlewareInput) => Promise<void> | void;
+
+export type IMiddleware = RequestHandler | IAppMiddleware;
+
 /**
  * Repository
  */
