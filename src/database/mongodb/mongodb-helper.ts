@@ -53,22 +53,22 @@ function deepMerge<T extends Record<string, unknown>, U extends Record<string, u
   return result as T & U
 }
 
-function stringToDateIfISODateTime(str: string): string | Date {
-  const isoDateTimeRegex =
-    /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})$/
+// function stringToDateIfISODateTime(str: string): string | Date {
+//   const isoDateTimeRegex =
+//     /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})$/
 
-  if (!isoDateTimeRegex.test(str)) {
-    return str
-  }
+//   if (!isoDateTimeRegex.test(str)) {
+//     return str
+//   }
 
-  const timestamp = Date.parse(str)
+//   const timestamp = Date.parse(str)
 
-  if (Number.isNaN(timestamp)) {
-    return str
-  }
+//   if (Number.isNaN(timestamp)) {
+//     return str
+//   }
 
-  return new Date(timestamp)
-}
+//   return new Date(timestamp)
+// }
 
 function convertPrimitive(value: unknown): unknown {
   if (!isString(value)) return value
@@ -79,8 +79,7 @@ function convertPrimitive(value: unknown): unknown {
     if (oid.toString() === value) return oid
   }
 
-  // Convert to Date
-  return stringToDateIfISODateTime(value)
+  return value
 }
 
 /**
