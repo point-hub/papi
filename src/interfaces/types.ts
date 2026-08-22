@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import type { Request, Response } from 'express'
+import type { Request, RequestHandler, Response } from 'express'
 import { ClientSession } from 'mongodb'
 /**
  * Controller
@@ -26,12 +26,12 @@ export interface IControllerOutput {
 export interface IMiddlewareInput {
   req: Request
   res: Response
-  dbConnection?: IDatabase
+  dbConnection: IDatabase
 }
 
 export type IAppMiddleware = (input: IMiddlewareInput) => Promise<void> | void;
 
-export type IMiddleware = IAppMiddleware;
+export type IMiddleware = RequestHandler | IAppMiddleware;
 
 /**
  * Repository
