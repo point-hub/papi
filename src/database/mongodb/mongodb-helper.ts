@@ -54,10 +54,18 @@ function deepMerge<T extends Record<string, unknown>, U extends Record<string, u
 }
 
 function stringToDateIfISODateTime(str: string): string | Date {
-  if (!str.includes('T')) return str
+  const isoDateTimeRegex =
+    /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})$/
+
+  if (!isoDateTimeRegex.test(str)) {
+    return str
+  }
 
   const timestamp = Date.parse(str)
-  if (Number.isNaN(timestamp)) return str
+
+  if (Number.isNaN(timestamp)) {
+    return str
+  }
 
   return new Date(timestamp)
 }
