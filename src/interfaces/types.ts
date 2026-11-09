@@ -154,16 +154,19 @@ export interface IAggregateOutput<TData> {
  */
 export interface IAppInput {
   mongoClient: MongoClient
+  database: Db
 }
 
 export interface IMakeControllerInput {
   controller: IController
   mongoClient: MongoClient
+  database: Db
 }
 
 export interface IMakeMiddlewareInput {
   middleware: IMiddleware
   mongoClient: MongoClient
+  database: Db
 }
 
 /**
