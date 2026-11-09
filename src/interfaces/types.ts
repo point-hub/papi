@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import type { NextFunction, Request, RequestHandler, Response } from 'express';
-import { MongoClient, ObjectId } from 'mongodb';
+import { AggregateOptions, BulkWriteOptions, Db, DeleteOptions, FindOneOptions, FindOptions, InsertOneOptions, MongoClient, ObjectId, UpdateOptions } from 'mongodb';
 /**
  * Controller
  */
@@ -9,6 +9,7 @@ export interface IControllerInput {
   res: Response
   next: NextFunction
   mongoClient: MongoClient
+  database: Db
 }
 
 export interface IController {
@@ -29,6 +30,7 @@ export interface IMiddlewareInput {
   res: Response
   next: NextFunction
   mongoClient: MongoClient
+  database: Db
 }
 
 export type IAppMiddleware = (input: IMiddlewareInput) => Promise<void> | void;
@@ -39,39 +41,39 @@ export type IMiddleware = RequestHandler | IAppMiddleware;
  * Repository
  */
 export interface IAggregateRepository<TData> {
-  handle(filter: IDocument, options?: unknown): Promise<IAggregateOutput<TData>>
+  handle(filter: IDocument, options?: AggregateOptions): Promise<IAggregateOutput<TData>>
 }
 
 export interface ICreateManyRepository {
-  handle(documents: IDocument[], options?: unknown): Promise<ICreateManyOutput>
+  handle(documents: IDocument[], options?: BulkWriteOptions): Promise<ICreateManyOutput>
 }
 
 export interface ICreateRepository {
-  handle(document: IDocument, options?: unknown): Promise<ICreateOutput>
+  handle(document: IDocument, options?: InsertOneOptions): Promise<ICreateOutput>
 }
 
 export interface IDeleteManyRepository {
-  handle(_ids: (string | ObjectId)[], options?: unknown): Promise<IDeleteManyOutput>
+  handle(_ids: (string | ObjectId)[], options?: DeleteOptions): Promise<IDeleteManyOutput>
 }
 
 export interface IDeleteRepository {
-  handle(_id: (string | ObjectId), options?: unknown): Promise<IDeleteOutput>
+  handle(_id: string | ObjectId, options?: DeleteOptions): Promise<IDeleteOutput>
 }
 
 export interface IRetrieveManyRepository<TData> {
-  handle(query: IQuery, options?: unknown): Promise<TData>
+  handle(query: IQuery, options?: FindOptions): Promise<TData>
 }
 
 export interface IRetrieveRepository<TOutput extends object> {
-  handle(_id: (string | ObjectId), options?: unknown): Promise<TOutput>
+  handle(_id: string | ObjectId, options?: FindOneOptions): Promise<TOutput>
 }
 
 export interface IUpdateManyRepository {
-  handle(filter: IDocument, document: IDocument, options?: unknown): Promise<IUpdateManyOutput>
+  handle(filter: IDocument, document: IDocument, options?: UpdateOptions): Promise<IUpdateManyOutput>
 }
 
 export interface IUpdateRepository {
-  handle(_id: (string | ObjectId), document: IDocument, options?: unknown): Promise<IUpdateOutput>
+  handle(_id: string | ObjectId, document: IDocument, options?: UpdateOptions): Promise<IUpdateOutput>
 }
 
 /**
@@ -169,6 +171,7 @@ export interface IMakeMiddlewareInput {
  */
 export interface IBaseRouterInput {
   mongoClient: MongoClient
+  database: Db
 }
 
 /**
