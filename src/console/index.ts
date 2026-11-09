@@ -1,13 +1,13 @@
-import { ExpressCli } from '@point-hub/express-cli'
+import { ExpressCli } from '@point-hub/express-cli';
 
-import MakeCommand from './commands/make-command/index.command'
-import MakeMiddleware from './commands/make-middleware/index.command'
+import MakeCommand from './commands/make-command/index.command';
+import MakeMiddleware from './commands/make-middleware/index.command';
 
 export class ConsoleKernel {
-  private command: ExpressCli
+  private command: ExpressCli;
 
   constructor(command: ExpressCli) {
-    this.command = command
+    this.command = command;
   }
 
   /**
@@ -17,7 +17,7 @@ export class ConsoleKernel {
    * this.command.register(new ExampleCommand());
    */
   async register() {
-    this.command.register(new MakeCommand())
-    this.command.register(new MakeMiddleware())
+    this.command.register(new MakeCommand());
+    this.command.register(new MakeMiddleware());
   }
 }

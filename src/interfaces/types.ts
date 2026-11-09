@@ -1,13 +1,14 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import type { Request, RequestHandler, Response } from 'express'
-import { ClientSession } from 'mongodb'
+import type { NextFunction, Request, RequestHandler, Response } from 'express';
+import { MongoClient, ObjectId } from 'mongodb';
 /**
  * Controller
  */
 export interface IControllerInput {
   req: Request
   res: Response
-  dbConnection: IDatabase
+  next: NextFunction
+  mongoClient: MongoClient
 }
 
 export interface IController {
@@ -26,7 +27,8 @@ export interface IControllerOutput {
 export interface IMiddlewareInput {
   req: Request
   res: Response
-  dbConnection: IDatabase
+  next: NextFunction
+  mongoClient: MongoClient
 }
 
 export type IAppMiddleware = (input: IMiddlewareInput) => Promise<void> | void;
@@ -49,18 +51,11 @@ export interface ICreateRepository {
 }
 
 export interface IDeleteManyRepository {
-  handle(_ids: string[], options?: unknown): Promise<IDeleteManyOutput>
+  handle(_ids: (string | ObjectId)[], options?: unknown): Promise<IDeleteManyOutput>
 }
 
 export interface IDeleteRepository {
-  handle(_id: string, options?: unknown): Promise<IDeleteOutput>
-}
-
-/**
- * @deprecated
- */
-export interface IRetrieveAllRepository<TData> {
-  handle(query: IQuery, options?: unknown): Promise<TData>
+  handle(_id: (string | ObjectId), options?: unknown): Promise<IDeleteOutput>
 }
 
 export interface IRetrieveManyRepository<TData> {
@@ -68,7 +63,7 @@ export interface IRetrieveManyRepository<TData> {
 }
 
 export interface IRetrieveRepository<TOutput extends object> {
-  handle(_id: string, options?: unknown): Promise<TOutput>
+  handle(_id: (string | ObjectId), options?: unknown): Promise<TOutput>
 }
 
 export interface IUpdateManyRepository {
@@ -76,7 +71,7 @@ export interface IUpdateManyRepository {
 }
 
 export interface IUpdateRepository {
-  handle(_id: string, document: IDocument, options?: unknown): Promise<IUpdateOutput>
+  handle(_id: (string | ObjectId), document: IDocument, options?: unknown): Promise<IUpdateOutput>
 }
 
 /**
@@ -124,14 +119,6 @@ export interface IPagination {
   total_document: number
 }
 
-/**
- * @deprecated
- */
-export interface IRetrieveAllOutput<TData> {
-  data: TData[]
-  pagination: IPagination
-}
-
 export interface IRetrieveManyOutput<TData> {
   data: TData[]
   pagination: IPagination
@@ -160,67 +147,37 @@ export interface IAggregateOutput<TData> {
   pagination: IPagination
 }
 
-// Todo: declare own client session
-// eslint-disable-next-line @typescript-eslint/no-empty-object-type
-export interface IClientSession extends ClientSession {}
-
-export interface IDatabase {
-  session: unknown
-  open(): Promise<void>
-  close(): Promise<void>
-  database(name: string, options?: unknown): this
-  collection(name: string, options?: unknown): this
-  listCollections(): Promise<{ name: string }[]>
-  startSession(): ClientSession
-  endSession(): Promise<void>
-  startTransaction(): void
-  commitTransaction(): Promise<void>
-  abortTransaction(): Promise<void>
-  createIndex(name: string, spec: unknown, options?: unknown): Promise<void>
-  createCollection(name: string, options?: unknown): Promise<void>
-  dropCollection(name: string, options?: unknown): Promise<void>
-  dropDatabase(options?: unknown): Promise<void>
-  updateSchema(name: string, schema: unknown): Promise<void>
-  command(document: IDocument, options?: unknown): Promise<IDocument>
-  create(document: IDocument, options?: unknown): Promise<ICreateOutput>
-  createMany(documents: IDocument[], options?: unknown): Promise<ICreateManyOutput>
-  retrieveAll<TData>(query: IQuery, options?: unknown): Promise<IRetrieveAllOutput<TData>>
-  retrieveMany<TData>(query: IQuery, options?: unknown): Promise<IRetrieveManyOutput<TData>>
-  retrieve<TOutput extends object>(_id: string, options?: unknown): Promise<TOutput | null>
-  update(filter: string | IDocument, document: IDocument, options?: unknown): Promise<IUpdateOutput>
-  updateOne(filter: IDocument, document: IDocument, options?: unknown): Promise<IUpdateOutput>
-  updateMany(filter: IDocument, document: IDocument, options?: unknown): Promise<IUpdateManyOutput>
-  delete(_id: string, options?: unknown): Promise<IDeleteOutput>
-  deleteMany(input: string[] | Record<string, unknown>, options?: unknown): Promise<IDeleteManyOutput>
-  deleteAll(options?: unknown): Promise<IDeleteManyOutput>
-  aggregate<TData>(pipeline?: IPipeline[], query?: IQuery, options?: unknown): Promise<IAggregateOutput<TData>>
-}
 /**
  * Express App
  */
 export interface IAppInput {
-  dbConnection: IDatabase
+  mongoClient: MongoClient
 }
+
 export interface IMakeControllerInput {
   controller: IController
-  dbConnection: IDatabase
+  mongoClient: MongoClient
 }
+
 export interface IMakeMiddlewareInput {
   middleware: IMiddleware
-  dbConnection: IDatabase
+  mongoClient: MongoClient
 }
+
 /**
  * Router
  */
 export interface IBaseRouterInput {
-  dbConnection: IDatabase
+  mongoClient: MongoClient
 }
+
 /**
  * Schema Validation
  */
 export interface ISchemaValidation {
   (document: IDocument, schema: IDocument): Promise<void>
 }
+
 /**
  * Config
  */
@@ -228,6 +185,7 @@ export interface IServerConfig {
   port: number
   host: string
 }
+
 export interface IMongoDBConfig {
   url: string
   name: string

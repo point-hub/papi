@@ -1,73 +1,105 @@
-import { Color } from '@point-hub/express-cli'
-import { beforeAll, describe, expect, it, spyOn } from 'bun:test'
-import crypto from 'crypto'
-import fs from 'fs'
-import shell from 'shelljs'
+import { Color } from '@point-hub/express-cli';
+import { afterEach, beforeAll, describe, expect, it, spyOn } from 'bun:test';
+import crypto from 'crypto';
+import fs from 'fs';
+import shell from 'shelljs';
 
-import MakeMiddlewareCommand from './index.command'
+import MakeMiddlewareCommand from './index.command';
 
-const dir = 'src/middleware'
+const dir = `${process.cwd()}/src/middleware`;
 
-function generateRandomName() {
-  let exists = true
-  let name = 'test'
-  while (exists) {
-    name = `test-${crypto.randomBytes(4).toString('hex')}`
-    exists = fs.existsSync(`${dir}/${name}`)
-  }
-  return name
+const createdDirectories: string[] = [];
+
+function generateRandomName(): string {
+  let name: string;
+
+  do {
+    name = `test-${crypto.randomBytes(4).toString('hex')}`;
+  } while (fs.existsSync(`${dir}/${name}`));
+
+  return name;
+}
+
+function createCommand(name: string, configurable = false) {
+  const command = new MakeMiddlewareCommand();
+
+  command.args = { name };
+  command.opts = {
+    '--configurable': configurable,
+  };
+
+  return command;
+}
+
+function cleanup(name: string) {
+  shell.rm('-rf', `${dir}/${name}`);
 }
 
 describe('make:middleware', () => {
   beforeAll(() => {
-    spyOn(console, 'error').mockImplementation(() => '')
-    spyOn(console, 'info').mockImplementation(() => '')
-  })
+    spyOn(console, 'error').mockImplementation(() => {});
+    spyOn(console, 'info').mockImplementation(() => {});
+  });
+
+  afterEach(() => {
+    for (const directory of createdDirectories) {
+      cleanup(directory);
+    }
+
+    createdDirectories.length = 0;
+  });
+
   it('should create new middleware', async () => {
-    const makeMiddlewareCommand = new MakeMiddlewareCommand()
-    makeMiddlewareCommand.args = {
-      name: generateRandomName()
-    }
-    const spy = spyOn(makeMiddlewareCommand, 'handle')
-    await makeMiddlewareCommand.handle()
+    const name = generateRandomName();
+    createdDirectories.push(name);
 
-    shell.rm('-rf', `${dir}/${makeMiddlewareCommand.args.name}`)
+    const command = createCommand(name);
 
-    expect(spy).toHaveBeenCalled()
-  })
+    await command.handle();
 
-  it('should create new configureable middleware', async () => {
-    const makeMiddlewareCommand = new MakeMiddlewareCommand()
-    makeMiddlewareCommand.args = {
-      name: generateRandomName()
-    }
-    makeMiddlewareCommand.opts = {
-      '--configurable': true
-    }
-    const spy = spyOn(makeMiddlewareCommand, 'handle')
-    await makeMiddlewareCommand.handle()
+    const middlewarePath = `${dir}/${name}/index.middleware.ts`;
+    const testPath = `${dir}/${name}/index.spec.ts`;
 
-    shell.rm('-rf', `${dir}/${makeMiddlewareCommand.args.name}`)
+    expect(fs.existsSync(middlewarePath)).toBe(true);
+    expect(fs.existsSync(testPath)).toBe(true);
 
-    expect(spy).toHaveBeenCalled()
-  })
+    const middleware = fs.readFileSync(middlewarePath, 'utf-8');
+    expect(middleware).not.toBe('');
+  });
 
-  it('should return error \'middleware directory exists\'', async () => {
-    const makeMiddlewareCommand = new MakeMiddlewareCommand()
-    makeMiddlewareCommand.args = {
-      name: generateRandomName()
-    }
-    const spy = spyOn(makeMiddlewareCommand, 'handle')
+  it('should create new configurable middleware', async () => {
+    const name = generateRandomName();
+    createdDirectories.push(name);
 
-    // first attempt it will create new middleware
-    await makeMiddlewareCommand.handle()
-    // second attempt it should return error because middleware directory exists
-    await makeMiddlewareCommand.handle()
+    const command = createCommand(name, true);
 
-    shell.rm('-rf', `${dir}/${makeMiddlewareCommand.args.name}`)
+    await command.handle();
 
-    expect(console.error).toHaveBeenCalled()
-    expect(console.error).toHaveBeenCalledWith(Color.red('Middleware directory is exists'))
-    expect(spy).toHaveBeenCalled()
-  })
-})
+    const middlewarePath = `${dir}/${name}/index.middleware.ts`;
+    const testPath = `${dir}/${name}/index.spec.ts`;
+
+    expect(fs.existsSync(middlewarePath)).toBe(true);
+    expect(fs.existsSync(testPath)).toBe(true);
+
+    const middleware = fs.readFileSync(middlewarePath, 'utf-8');
+
+    expect(middleware).not.toBe('');
+  });
+
+  it('should return error when middleware directory exists', async () => {
+    const name = generateRandomName();
+    createdDirectories.push(name);
+
+    const command = createCommand(name);
+
+    await command.handle();
+
+    const consoleError = spyOn(console, 'error');
+
+    await command.handle();
+
+    expect(consoleError).toHaveBeenCalledWith(
+      Color.red('Middleware directory is exists'),
+    );
+  });
+});

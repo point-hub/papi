@@ -1,8 +1,8 @@
-import { expect, it } from 'bun:test'
+import { expect, it } from 'bun:test';
 
-import { createApp } from './app'
+import { createApp } from './app';
 
 it('express app to be defined', async () => {
-  const app = await createApp()
-  expect(app).toBeDefined()
-})
+  const app = await createApp();
+  expect(app).toBeDefined();
+});

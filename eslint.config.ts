@@ -1,8 +1,8 @@
-import js from '@eslint/js'
-import typescriptEslint from '@typescript-eslint/eslint-plugin'
-import tsParser from '@typescript-eslint/parser'
-import simpleImportSort from 'eslint-plugin-simple-import-sort'
-import globals from 'globals'
+import js from '@eslint/js';
+import typescriptEslint from '@typescript-eslint/eslint-plugin';
+import tsParser from '@typescript-eslint/parser';
+import simpleImportSort from 'eslint-plugin-simple-import-sort';
+import globals from 'globals';
 
 export default [
   js.configs.recommended,
@@ -15,25 +15,25 @@ export default [
       '**/build/**',
       '**/.env*',
       '**/coverage/**',
-      '**/tsconfig.tsbuildinfo'
+      '**/tsconfig.tsbuildinfo',
     ],
 
     languageOptions: {
       parser: tsParser,
       parserOptions: {
         ecmaVersion: 'latest',
-        sourceType: 'module'
+        sourceType: 'module',
       },
       globals: {
         ...globals.node,
         ...globals.es2021,
-        Bun: true
-      }
+        Bun: true,
+      },
     },
 
     plugins: {
       '@typescript-eslint': typescriptEslint,
-      'simple-import-sort': simpleImportSort
+      'simple-import-sort': simpleImportSort,
     },
 
     rules: {
@@ -43,6 +43,15 @@ export default [
       // typescript
       ...typescriptEslint.configs.recommended.rules,
 
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        {
+          argsIgnorePattern: '^_',
+          varsIgnorePattern: '^_',
+          caughtErrorsIgnorePattern: '^_',
+        },
+      ],
+
       // import sorting
       'simple-import-sort/imports': 'error',
       'simple-import-sort/exports': 'error',
@@ -51,11 +60,11 @@ export default [
       'max-len': ['error', { code: 9999999 }],
       'indent': ['error', 2],
       'quotes': ['error', 'single'],
-      'semi': ['error', 'never'],
+      'semi': ['error', 'always'],
       'object-curly-spacing': ['error', 'always'],
-      'comma-dangle': ['error', 'never'],
+      'comma-dangle': ['error', 'always-multiline'],
       'no-trailing-spaces': 'error',
-      'eol-last': ['error', 'always']
-    }
-  }
-]
+      'eol-last': ['error', 'always'],
+    },
+  },
+];

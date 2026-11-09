@@ -42,10 +42,10 @@ export abstract class BaseUseCase<
   IDependencies,
   ISuccessData
 > {
-  protected readonly deps: IDependencies
+  protected readonly deps: IDependencies;
 
   constructor(deps: IDependencies) {
-    this.deps = deps
+    this.deps = deps;
   }
 
   /**
@@ -54,7 +54,7 @@ export abstract class BaseUseCase<
    * @returns An IUseCaseOutputSuccess object.
    */
   protected success(data: ISuccessData): IUseCaseOutputSuccess<ISuccessData> {
-    return { status: 'success', data }
+    return { status: 'success', data };
   }
 
   /**
@@ -67,9 +67,9 @@ export abstract class BaseUseCase<
       status: 'failed',
       error: {
         name: 'ApiError',
-        ...error
-      }
-    }
+        ...error,
+      },
+    };
   }
 
   /**

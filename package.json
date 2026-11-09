@@ -1,6 +1,6 @@
 {
   "name": "@point-hub/papi",
-  "version": "0.6.6",
+  "version": "0.7.1",
   "description": "Point API Framework",
   "type": "module",
   "main": "lib/index.js",
@@ -33,23 +33,23 @@
     "url": "https://github.com/point-hub/papi.git"
   },
   "devDependencies": {
-    "@eslint/eslintrc": "^3.3.6",
-    "@eslint/js": "^9.39.2",
+    "@eslint/eslintrc": "^3.3.7",
+    "@eslint/js": "^10.0.1",
     "@types/compression": "^1.8.1",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
-    "@types/node": "^25.0.8",
+    "@types/node": "^26.6.6",
     "@types/shelljs": "^0.10.0",
     "@types/validatorjs": "^3.15.5",
-    "@typescript-eslint/eslint-plugin": "^8.67.0",
-    "@typescript-eslint/parser": "^8.67.0",
-    "bun-types": "^1.4.0",
+    "@typescript-eslint/eslint-plugin": "^8.72.1",
+    "@typescript-eslint/parser": "^8.72.1",
+    "bun-types": "^1.4.4",
     "cross-env": "^10.1.0",
-    "eslint": "^10.9.0",
+    "eslint": "^10.14.0",
     "eslint-plugin-simple-import-sort": "^14.0.0",
     "jiti": "^2.7.0",
     "shx": "^0.4.0",
-    "typescript": "^5.9.3"
+    "typescript": "npm:@typescript/typescript6@^6.0.2"
   },
   "dependencies": {
     "@point-hub/express-cli": "^0.2.2",
