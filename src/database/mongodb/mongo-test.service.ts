@@ -50,6 +50,53 @@ export class MongoTestService {
   }
 
   /**
+   * Provides access to the MongoDB client.
+   *
+   * Use this to access native MongoDB client functionality,
+   * such as creating sessions and managing transactions.
+   *
+   * @example
+   * ```ts
+   * const session = mongoTestService.client.startSession()
+   * ```
+   */
+  public get client(): MongoClient {
+    return this.mongoClient;
+  }
+
+  /**
+   * Provides access to the MongoDB database.
+   *
+   * Use this to perform direct database operations in tests,
+   * such as inserting fixtures and querying documents.
+   *
+   * @example
+   * ```ts
+   * await mongoTestService.database.collection('users').insertOne({
+   *   email: 'john@example.com'
+   * })
+   * ```
+   */
+  public get database(): Db {
+    return this.db;
+  }
+
+  /**
+   * Provides access to the MongoDB service.
+   *
+   * Use this to perform MongoDB operations through the service abstraction
+   * instead of accessing the database directly.
+   *
+   * @example
+   * ```ts
+   * await mongoTestService.service.createUnique('users', { email: 1 })
+   * ```
+   */
+  public get service(): MongoService {
+    return this.mongoService;
+  }
+
+  /**
    * Establishes a connection to MongoDB.
    *
    * @returns A promise that resolves when the connection is established.
