@@ -1,5 +1,5 @@
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'bun:test';
-import { Db, Document, MongoClient } from 'mongodb';
+import { Db, Document, MongoClient, ObjectId } from 'mongodb';
 
 import { MongoService } from './mongo.service';
 import { MongoTestService } from './mongo-test.service';
@@ -293,27 +293,24 @@ describe('MongoService integration', () => {
   });
 
   describe('retrieveOne', () => {
-    it('retrieves the first matching document', async () => {
+    it('retrieves a document by ID', async () => {
       const collection = db.collection<IUserDocument>('users');
 
-      await collection.insertMany([
-        { email: 'john@example.com' },
-        { email: 'jane@example.com' },
-      ]);
+      const inserted = await collection.insertOne({
+        email: 'john@example.com',
+      });
+
+      await collection.insertOne({
+        email: 'jane@example.com',
+      });
 
       const result = await mongoService.retrieveOne<IUserDocument>(
         'users',
-        [
-          {
-            $match: {
-              email: 'john@example.com',
-            },
-          },
-        ],
-        {},
+        inserted.insertedId,
       );
 
       expect(result).toMatchObject({
+        _id: inserted.insertedId,
         email: 'john@example.com',
       });
     });
@@ -323,17 +320,28 @@ describe('MongoService integration', () => {
 
       const result = await mongoService.retrieveOne<IUserDocument>(
         'users',
-        [
-          {
-            $match: {
-              email: 'unknown@example.com',
-            },
-          },
-        ],
-        {},
+        new ObjectId(),
       );
 
       expect(result).toBeNull();
+    });
+
+    it('accepts a string ID', async () => {
+      const collection = db.collection<IUserDocument>('users');
+
+      const inserted = await collection.insertOne({
+        email: 'john@example.com',
+      });
+
+      const result = await mongoService.retrieveOne<IUserDocument>(
+        'users',
+        inserted.insertedId.toString(),
+      );
+
+      expect(result).toMatchObject({
+        _id: inserted.insertedId,
+        email: 'john@example.com',
+      });
     });
   });
 });

@@ -1,4 +1,4 @@
-import { type AggregateOptions, type CreateIndexesOptions, type Db, type Document, type IndexSpecification } from 'mongodb';
+import { type AggregateOptions, type CreateIndexesOptions, type Db, type Document, FindOneOptions, type IndexSpecification, ObjectId } from 'mongodb';
 
 import { type IPagination, MongoQueryBuilder } from '../../index';
 
@@ -322,67 +322,47 @@ export class MongoService {
     };
   }
 
+
   /**
-   * Retrieves the first document matching an aggregation pipeline.
+   * Retrieves a single document by its ID.
    *
-   * Executes the provided aggregation pipeline and returns the first
-   * matching document. Returns `null` if no document is found.
+   * Finds and returns the document matching the provided MongoDB `_id`.
+   * Returns `null` if no document is found.
    *
    * @typeParam T - The expected document structure of the retrieved data.
    *
    * @param collection - The name of the MongoDB collection.
-   * @param pipeline - The aggregation pipeline used to filter or transform documents.
-   * @param options - MongoDB aggregation options.
+   * @param _id - The ID of the document to retrieve.
+   * @param options - MongoDB find options.
    *
-   * @returns The first matching document, or `null` if no document is found.
+   * @returns The matching document, or `null` if no document is found.
    *
    * @example
-   * // Retrieve an active user by email.
+   * // Retrieve a user by ID.
    * const user = await mongoDBService.retrieveOne<IUser>(
    *   'users',
-   *   [
-   *     {
-   *       $match: {
-   *         email: 'john@example.com',
-   *         status: 'active',
-   *       },
-   *     },
-   *   ],
-   *   {},
+   *   userId,
    * );
    *
    * @example
-   * // Retrieve a user with their associated profile.
+   * // Retrieve a user by ID with query options.
    * const user = await mongoDBService.retrieveOne<IUser>(
    *   'users',
-   *   [
-   *     {
-   *       $match: {
-   *         _id: userId,
-   *       },
+   *   userId,
+   *   {
+   *     projection: {
+   *       name: 1,
+   *       email: 1,
    *     },
-   *     {
-   *       $lookup: {
-   *         from: 'profiles',
-   *         localField: '_id',
-   *         foreignField: 'user_id',
-   *         as: 'profile',
-   *       },
-   *     },
-   *   ],
-   *   {},
+   *   },
    * );
    */
   public async retrieveOne<T extends Document>(
     collection: string,
-    pipeline: Document[] = [],
-    options: AggregateOptions,
+    _id: string | ObjectId,
+    options?: FindOneOptions,
   ): Promise<T | null> {
-    const data = await this.db
-      .collection(collection)
-      .aggregate<T>(pipeline, options)
-      .toArray();
-
-    return data && data.length ? data[0] : null;
+    const objectId = typeof _id === 'string' ? new ObjectId(_id) : _id;
+    return await this.db.collection(collection).findOne<T>({ _id: objectId }, options);
   }
 }
