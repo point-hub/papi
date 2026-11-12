@@ -364,8 +364,8 @@ export class MongoService {
     collection: string,
     _id: string | ObjectId,
     options?: {
-      objectIdFields: readonly string[],
-      findOneOptions: FindOneOptions
+      findOneOptions?: FindOneOptions
+      objectIdFields?: readonly string[],
     },
   ): Promise<T | null> {
     const response = await this.database.collection(collection).findOne<T>({ _id: new ObjectId(_id) }, options?.findOneOptions);
