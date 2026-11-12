@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'bun:test';
+import { ObjectId } from 'mongodb';
 
 import {
   addBooleanFilter,
@@ -11,6 +12,7 @@ import {
   createProjection,
   createSort,
   excludeFields,
+  fromObjectIds,
   IFieldsObject,
   isPlainObject,
   parseBoolean,
@@ -20,6 +22,7 @@ import {
   parsePageSize,
   parseProjection,
   parseSort,
+  toObjectIds,
 } from './mongo-query-builder.utils';
 
 describe('MongoQueryBuilder', () => {
@@ -811,6 +814,373 @@ describe('MongoQueryBuilder', () => {
           'profile.avatar': true,
         },
       });
+    });
+  });
+
+  const ID_1 = '665f1c2e8a1b2c3d4e5f6a7b';
+  const ID_2 = '665f1c2e8a1b2c3d4e5f6a7c';
+
+  /** Asserts a value is an ObjectId with the expected hex string. */
+  const expectObjectId = (value: unknown, hex: string) => {
+    expect(value).toBeInstanceOf(ObjectId);
+    expect((value as ObjectId).toHexString()).toBe(hex);
+  };
+
+  describe('toObjectIds', () => {
+    it('converts a plain field', () => {
+      const result = toObjectIds({ name: 'Admin', created_by_id: ID_1 }, ['created_by_id']);
+
+      expectObjectId(result['created_by_id'], ID_1);
+      expect(result['name']).toBe('Admin');
+    });
+
+    it('converts a nested object field', () => {
+      const result = toObjectIds(
+        { owner: { user_id: ID_1, name: 'Ann' } },
+        ['owner.user_id'],
+      ) as { owner: { user_id: unknown; name: string } };
+
+      expectObjectId(result.owner.user_id, ID_1);
+      expect(result.owner.name).toBe('Ann');
+    });
+
+    it('converts every item of an array of IDs', () => {
+      const result = toObjectIds({ permission_ids: [ID_1, ID_2] }, ['permission_ids']) as {
+      permission_ids: unknown[];
+    };
+
+      expect(result.permission_ids).toHaveLength(2);
+      expectObjectId(result.permission_ids[0], ID_1);
+      expectObjectId(result.permission_ids[1], ID_2);
+    });
+
+    it('converts a field inside every item of an array of objects', () => {
+      const result = toObjectIds(
+        {
+          approvers: [
+            { user_id: ID_1, level: 1 },
+            { user_id: ID_2, level: 2 },
+          ],
+        },
+        ['approvers.user_id'],
+      ) as { approvers: { user_id: unknown; level: number }[] };
+
+      expectObjectId(result.approvers[0].user_id, ID_1);
+      expectObjectId(result.approvers[1].user_id, ID_2);
+      expect(result.approvers.map(a => a.level)).toEqual([1, 2]);
+    });
+
+    it('converts through an object that contains an array of objects', () => {
+      const result = toObjectIds(
+        { flow: { steps: [{ user_id: ID_1 }, { user_id: ID_2 }] } },
+        ['flow.steps.user_id'],
+      ) as { flow: { steps: { user_id: unknown }[] } };
+
+      expectObjectId(result.flow.steps[0].user_id, ID_1);
+      expectObjectId(result.flow.steps[1].user_id, ID_2);
+    });
+
+    it('converts several paths at once', () => {
+      const result = toObjectIds(
+        {
+          created_by_id: ID_1,
+          owner: { user_id: ID_1 },
+          permission_ids: [ID_2],
+          approvers: [{ user_id: ID_2 }],
+        },
+        ['created_by_id', 'owner.user_id', 'permission_ids', 'approvers.user_id'],
+      ) as {
+      created_by_id: unknown;
+      owner: { user_id: unknown };
+      permission_ids: unknown[];
+      approvers: { user_id: unknown }[];
+    };
+
+      expectObjectId(result.created_by_id, ID_1);
+      expectObjectId(result.owner.user_id, ID_1);
+      expectObjectId(result.permission_ids[0], ID_2);
+      expectObjectId(result.approvers[0].user_id, ID_2);
+    });
+
+    it('does not convert fields that are not listed', () => {
+      const result = toObjectIds({ created_by_id: ID_1, code: ID_2 }, ['created_by_id']);
+
+      expectObjectId(result['created_by_id'], ID_1);
+      expect(result['code']).toBe(ID_2); // looks like an ID, but is not listed
+    });
+
+    it('does not mutate the input', () => {
+      const input = {
+        created_by_id: ID_1,
+        owner: { user_id: ID_1 },
+        approvers: [{ user_id: ID_2 }],
+      };
+
+      toObjectIds(input, ['created_by_id', 'owner.user_id', 'approvers.user_id']);
+
+      expect(input.created_by_id).toBe(ID_1);
+      expect(input.owner.user_id).toBe(ID_1);
+      expect(input.approvers[0].user_id).toBe(ID_2);
+    });
+
+    it('skips missing fields without creating them', () => {
+      const result = toObjectIds({ name: 'Admin' }, ['created_by_id', 'owner.user_id']);
+
+      expect(result).toEqual({ name: 'Admin' });
+      expect('created_by_id' in result).toBe(false);
+      expect('owner' in result).toBe(false);
+    });
+
+    it('leaves null and undefined values as they are', () => {
+      const result = toObjectIds({ created_by_id: null, role_id: undefined }, [
+        'created_by_id',
+        'role_id',
+      ]);
+
+      expect(result['created_by_id']).toBeNull();
+      expect(result['role_id']).toBeUndefined();
+    });
+
+    it('keeps a value that is already an ObjectId', () => {
+      const id = new ObjectId(ID_1);
+      const result = toObjectIds({ created_by_id: id }, ['created_by_id']);
+
+      expect(result['created_by_id']).toBe(id);
+    });
+
+    it('leaves invalid ID strings unchanged so schema validation can reject them', () => {
+      const result = toObjectIds(
+        { created_by_id: 'abc', role_id: ID_1 + 'ff' },
+        ['created_by_id', 'role_id'],
+      );
+
+      expect(result['created_by_id']).toBe('abc');
+      expect(result['role_id']).toBe(ID_1 + 'ff');
+    });
+
+    it('accepts uppercase hex strings', () => {
+      const result = toObjectIds({ created_by_id: ID_1.toUpperCase() }, ['created_by_id']);
+
+      expectObjectId(result['created_by_id'], ID_1);
+    });
+
+    it('skips a nested path when the parent is not a plain object', () => {
+      const result = toObjectIds({ owner: 'not-an-object', tags: null }, [
+        'owner.user_id',
+        'tags.user_id',
+      ]);
+
+      expect(result).toEqual({ owner: 'not-an-object', tags: null });
+    });
+
+    it('skips array items that lack the key', () => {
+      const result = toObjectIds(
+        { approvers: [{ user_id: ID_1 }, { level: 2 }] },
+        ['approvers.user_id'],
+      ) as { approvers: { user_id?: unknown; level?: number }[] };
+
+      expectObjectId(result.approvers[0].user_id, ID_1);
+      expect(result.approvers[1]).toEqual({ level: 2 });
+    });
+
+    it('preserves Date and other untouched values by reference', () => {
+      const createdAt = new Date('2026-01-01T00:00:00.000Z');
+      const result = toObjectIds({ created_at: createdAt, created_by_id: ID_1 }, ['created_by_id']);
+
+      expect(result['created_at']).toBe(createdAt);
+    });
+
+    it('returns an equal document when no paths are given', () => {
+      const input = { created_by_id: ID_1 };
+
+      expect(toObjectIds(input, [])).toEqual(input);
+    });
+  });
+
+  describe('fromObjectIds', () => {
+    const oid1 = new ObjectId(ID_1);
+    const oid2 = new ObjectId(ID_2);
+
+    it('converts a plain field and _id', () => {
+      const result = fromObjectIds({ _id: oid1, created_by_id: oid2, name: 'Admin' }, [
+        '_id',
+        'created_by_id',
+      ]);
+
+      expect(result).toEqual({ _id: ID_1, created_by_id: ID_2, name: 'Admin' });
+    });
+
+    it('converts a nested object field', () => {
+      const result = fromObjectIds({ owner: { user_id: oid1, name: 'Ann' } }, ['owner.user_id']);
+
+      expect(result).toEqual({ owner: { user_id: ID_1, name: 'Ann' } });
+    });
+
+    it('converts every item of an array of IDs', () => {
+      const result = fromObjectIds({ permission_ids: [oid1, oid2] }, ['permission_ids']);
+
+      expect(result).toEqual({ permission_ids: [ID_1, ID_2] });
+    });
+
+    it('converts a field inside every item of an array of objects', () => {
+      const result = fromObjectIds(
+        {
+          approvers: [
+            { user_id: oid1, level: 1 },
+            { user_id: oid2, level: 2 },
+          ],
+        },
+        ['approvers.user_id'],
+      );
+
+      expect(result).toEqual({
+        approvers: [
+          { user_id: ID_1, level: 1 },
+          { user_id: ID_2, level: 2 },
+        ],
+      });
+    });
+
+    it('converts through an object that contains an array of objects', () => {
+      const result = fromObjectIds(
+        { flow: { steps: [{ user_id: oid1 }, { user_id: oid2 }] } },
+        ['flow.steps.user_id'],
+      );
+
+      expect(result).toEqual({ flow: { steps: [{ user_id: ID_1 }, { user_id: ID_2 }] } });
+    });
+
+    it('converts several paths at once', () => {
+      const result = fromObjectIds(
+        {
+          _id: oid1,
+          owner: { user_id: oid1 },
+          permission_ids: [oid2],
+          approvers: [{ user_id: oid2 }],
+        },
+        ['_id', 'owner.user_id', 'permission_ids', 'approvers.user_id'],
+      );
+
+      expect(result).toEqual({
+        _id: ID_1,
+        owner: { user_id: ID_1 },
+        permission_ids: [ID_2],
+        approvers: [{ user_id: ID_2 }],
+      });
+    });
+
+    it('does not convert ObjectIds that are not listed', () => {
+      const result = fromObjectIds({ _id: oid1, other_id: oid2 }, ['_id']) as Record<string, unknown>;
+
+      expect(result['_id']).toBe(ID_1);
+      expect(result['other_id']).toBe(oid2);
+    });
+
+    it('does not mutate the input', () => {
+      const input = {
+        created_by_id: oid1,
+        owner: { user_id: oid1 },
+        approvers: [{ user_id: oid2 }],
+      };
+
+      fromObjectIds(input, ['created_by_id', 'owner.user_id', 'approvers.user_id']);
+
+      expect(input.created_by_id).toBe(oid1);
+      expect(input.owner.user_id).toBe(oid1);
+      expect(input.approvers[0].user_id).toBe(oid2);
+    });
+
+    it('skips missing fields without creating them', () => {
+      const result = fromObjectIds({ name: 'Admin' }, ['created_by_id', 'owner.user_id']);
+
+      expect(result).toEqual({ name: 'Admin' });
+      expect('created_by_id' in (result as object)).toBe(false);
+      expect('owner' in (result as object)).toBe(false);
+    });
+
+    it('leaves null and undefined values as they are', () => {
+      const result = fromObjectIds({ created_by_id: null, role_id: undefined }, [
+        'created_by_id',
+        'role_id',
+      ]) as Record<string, unknown>;
+
+      expect(result['created_by_id']).toBeNull();
+      expect(result['role_id']).toBeUndefined();
+    });
+
+    it('leaves values that are already strings as they are', () => {
+      const result = fromObjectIds({ created_by_id: ID_1, code: 'abc' }, ['created_by_id', 'code']);
+
+      expect(result).toEqual({ created_by_id: ID_1, code: 'abc' });
+    });
+
+    it('skips a nested path when the parent is not a plain object', () => {
+      const result = fromObjectIds({ owner: 'not-an-object', tags: null }, [
+        'owner.user_id',
+        'tags.user_id',
+      ]);
+
+      expect(result).toEqual({ owner: 'not-an-object', tags: null });
+    });
+
+    it('skips array items that lack the key', () => {
+      const result = fromObjectIds(
+        { approvers: [{ user_id: oid1 }, { level: 2 }] },
+        ['approvers.user_id'],
+      );
+
+      expect(result).toEqual({ approvers: [{ user_id: ID_1 }, { level: 2 }] });
+    });
+
+    it('preserves Date and other untouched values by reference', () => {
+      const createdAt = new Date('2026-01-01T00:00:00.000Z');
+      const result = fromObjectIds({ created_at: createdAt, _id: oid1 }, ['_id']) as Record<
+      string,
+      unknown
+    >;
+
+      expect(result['created_at']).toBe(createdAt);
+    });
+
+    it('returns an equal document when no paths are given', () => {
+      const input = { _id: oid1 };
+
+      expect(fromObjectIds(input, [])).toEqual(input);
+    });
+
+    it('returns the typed document', () => {
+      const result = fromObjectIds<{ _id: string; name: string }>({ _id: oid1, name: 'Admin' }, [
+        '_id',
+      ]);
+
+      expect(result._id).toBe(ID_1);
+      expect(result.name).toBe('Admin');
+    });
+  });
+
+  describe('toObjectIds and fromObjectIds round trip', () => {
+    const paths = ['_id', 'created_by_id', 'owner.user_id', 'permission_ids', 'approvers.user_id'];
+
+    it('restores the original document', () => {
+      const original = {
+        _id: ID_1,
+        name: 'Admin',
+        created_by_id: ID_2,
+        owner: { user_id: ID_1, name: 'Ann' },
+        permission_ids: [ID_1, ID_2],
+        approvers: [
+          { user_id: ID_1, level: 1 },
+          { user_id: ID_2, level: 2 },
+        ],
+      };
+
+      expect(fromObjectIds(toObjectIds(original, paths), paths)).toEqual(original);
+    });
+
+    it('restores a document that has missing and null fields', () => {
+      const original = { _id: ID_1, created_by_id: null, name: 'Admin' };
+
+      expect(fromObjectIds(toObjectIds(original, paths), paths)).toEqual(original);
     });
   });
 });

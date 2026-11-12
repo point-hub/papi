@@ -1,5 +1,5 @@
-
 import type { SortDirection } from 'mongodb';
+import { ObjectId } from 'mongodb';
 
 export interface IFieldsObject {
   [key: string]: number
@@ -703,6 +703,157 @@ export const buildUpdateData = (
   return update;
 };
 
+const OBJECT_ID_PATTERN = /^[0-9a-f]{24}$/i;
+
+/**
+ * Walks a dot-notation path and applies `transform` to the leaf value.
+ * Arrays are traversed automatically. Missing keys are not created.
+ */
+const mapPath = (
+  value: unknown,
+  segments: string[],
+  transform: (leaf: unknown) => unknown,
+): unknown => {
+  // Arrays are traversed automatically, so no wildcard is needed in the path.
+  if (Array.isArray(value)) {
+    return value.map(item => mapPath(item, segments, transform));
+  }
+
+  // End of the path: transform the leaf value.
+  if (segments.length === 0) return transform(value);
+
+  if (!isPlainObject(value)) return value;
+
+  const [key, ...rest] = segments;
+  if (!(key in value)) return value; // missing key: don't create it
+
+  return { ...value, [key]: mapPath(value[key], rest, transform) };
+};
+
+const mapPaths = (
+  document: object,
+  paths: readonly string[],
+  transform: (leaf: unknown) => unknown,
+): Record<string, unknown> => {
+  let result: unknown = document;
+
+  for (const path of paths) {
+    result = mapPath(result, path.split('.'), transform);
+  }
+
+  return result as Record<string, unknown>;
+};
+
+/** Converts a 24-character hex string to `ObjectId`, leaves everything else as is. */
+const stringToObjectId = (value: unknown): unknown =>
+  typeof value === 'string' && OBJECT_ID_PATTERN.test(value)
+    ? new ObjectId(value)
+    : value;
+
+/** Converts an `ObjectId` to its hex string, leaves everything else as is. */
+const objectIdToString = (value: unknown): unknown =>
+  value instanceof ObjectId ? value.toHexString() : value;
+
+/**
+ * Converts the listed fields of a document from string IDs to `ObjectId`.
+ *
+ * Only the given dot-notation paths are converted. Everything else is left
+ * untouched. The input is not mutated, and a new object is returned.
+ *
+ * - Missing, `undefined` and `null` fields are skipped.
+ * - Values that are already `ObjectId`, or are not 24-character hex strings,
+ *   are left as they are, so invalid IDs fail loudly at schema validation.
+ * - Arrays are traversed automatically, both arrays of IDs and arrays of objects.
+ *
+ * @param document - Document to convert.
+ * @param paths - Dot-notation paths of the fields that hold IDs.
+ * @returns A copy of the document with the listed fields converted.
+ *
+ * @example Plain field
+ * ```ts
+ * toObjectIds({ name: 'Admin', created_by_id: '665f1c2e8a1b2c3d4e5f6a7b' }, ['created_by_id']);
+ * // { name: 'Admin', created_by_id: ObjectId('665f1c2e8a1b2c3d4e5f6a7b') }
+ * ```
+ *
+ * @example Nested object
+ * ```ts
+ * toObjectIds({ owner: { user_id: '665f1c2e8a1b2c3d4e5f6a7b', name: 'Ann' } }, ['owner.user_id']);
+ * // { owner: { user_id: ObjectId('665f1c2e8a1b2c3d4e5f6a7b'), name: 'Ann' } }
+ * ```
+ *
+ * @example Array of IDs
+ * ```ts
+ * toObjectIds({ permission_ids: ['665f1c2e8a1b2c3d4e5f6a7b', '665f1c2e8a1b2c3d4e5f6a7c'] }, ['permission_ids']);
+ * // { permission_ids: [ObjectId('...7b'), ObjectId('...7c')] }
+ * ```
+ *
+ * @example Nested array of objects
+ * ```ts
+ * toObjectIds(
+ *   {
+ *     approvers: [
+ *       { user_id: '665f1c2e8a1b2c3d4e5f6a7b', level: 1 },
+ *       { user_id: '665f1c2e8a1b2c3d4e5f6a7c', level: 2 },
+ *     ],
+ *   },
+ *   ['approvers.user_id'],
+ * );
+ * // { approvers: [{ user_id: ObjectId('...7b'), level: 1 }, { user_id: ObjectId('...7c'), level: 2 }] }
+ * ```
+ *
+ * @example Several paths at once
+ * ```ts
+ * toObjectIds(data, ['created_by_id', 'owner.user_id', 'permission_ids', 'approvers.user_id']);
+ * ```
+ */
+export const toObjectIds = (
+  document: object,
+  paths: readonly string[],
+): Record<string, unknown> => mapPaths(document, paths, stringToObjectId);
+
+/**
+ * Converts the listed fields of a document from `ObjectId` to hex strings.
+ *
+ * Use this on read, so use cases only see plain strings. It follows the same
+ * rules as `toObjectIds`: only the given dot-notation paths are converted,
+ * arrays are traversed automatically, missing, `undefined` and `null` fields
+ * are skipped, and the input is not mutated. Values that are not `ObjectId`
+ * instances are left as they are.
+ *
+ * @typeParam T - Shape of the returned document.
+ * @param document - Document to convert.
+ * @param paths - Dot-notation paths of the fields that hold IDs.
+ * @returns A copy of the document with the listed fields converted.
+ *
+ * @example Plain field and `_id`
+ * ```ts
+ * fromObjectIds<IRole>(doc, ['_id', 'created_by_id']);
+ * // { _id: '665f1c2e8a1b2c3d4e5f6a7b', created_by_id: '665f1c2e8a1b2c3d4e5f6a7c', ... }
+ * ```
+ *
+ * @example Nested object
+ * ```ts
+ * fromObjectIds(doc, ['owner.user_id']);
+ * // { owner: { user_id: '665f1c2e8a1b2c3d4e5f6a7b', name: 'Ann' } }
+ * ```
+ *
+ * @example Array of IDs
+ * ```ts
+ * fromObjectIds(doc, ['permission_ids']);
+ * // { permission_ids: ['665f1c2e8a1b2c3d4e5f6a7b', '665f1c2e8a1b2c3d4e5f6a7c'] }
+ * ```
+ *
+ * @example Nested array of objects
+ * ```ts
+ * fromObjectIds(doc, ['approvers.user_id']);
+ * // { approvers: [{ user_id: '665f1c2e8a1b2c3d4e5f6a7b', level: 1 }, ...] }
+ * ```
+ */
+export const fromObjectIds = <T = Record<string, unknown>>(
+  document: object,
+  paths: readonly string[],
+): T => mapPaths(document, paths, objectIdToString) as T;
+
 /**
  * Collection of utility functions.
  */
@@ -725,4 +876,6 @@ export default {
   parseComparisons,
   isPlainObject,
   buildUpdateData,
+  toObjectIds,
+  fromObjectIds,
 };
