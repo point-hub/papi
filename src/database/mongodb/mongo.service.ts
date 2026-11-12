@@ -1,6 +1,7 @@
 import { type AggregateOptions, type CreateIndexesOptions, type Db, type Document, FindOneOptions, type IndexSpecification, ObjectId } from 'mongodb';
 
 import { type IPagination, MongoQueryBuilder } from '../../index';
+import { fromObjectIds } from './mongo-query-builder.utils';
 
 /**
  * Represents the result of a paginated MongoDB query.
@@ -45,6 +46,9 @@ export interface IRetrievePaginatedOptions {
 
   /** Additional MongoDB aggregation options. */
   aggregateOptions?: AggregateOptions;
+
+  /** Dot-notation paths of the fields that hold IDs. */
+  objectIdFields?: readonly string[],
 }
 
 /**
@@ -59,7 +63,7 @@ export interface IRetrievePaginatedOptions {
  * @see https://www.mongodb.com/docs/manual/core/index-partial/
  */
 export class MongoService {
-  private db: Db;
+  private database: Db;
 
   /**
    * Creates a MongoDB service instance.
@@ -67,7 +71,7 @@ export class MongoService {
    * @param db - The MongoDB database instance used by this service.
    */
   constructor(db: Db) {
-    this.db = db;
+    this.database = db;
   }
 
   /**
@@ -96,7 +100,7 @@ export class MongoService {
     collection: string,
     spec: IndexSpecification,
   ): Promise<void> {
-    await this.db.createIndex(collection, spec, {
+    await this.database.createIndex(collection, spec, {
       unique: true,
       collation: {
         locale: 'en',
@@ -128,7 +132,7 @@ export class MongoService {
     collection: string,
     spec: IndexSpecification,
   ): Promise<void> {
-    await this.db.createIndex(collection, spec, {
+    await this.database.createIndex(collection, spec, {
       unique: true,
       sparse: true,
       collation: {
@@ -171,7 +175,7 @@ export class MongoService {
     spec: IndexSpecification,
     options?: CreateIndexesOptions,
   ): Promise<void> {
-    await this.db.createIndex(collection, spec, options);
+    await this.database.createIndex(collection, spec, options);
   }
 
   /**
@@ -184,7 +188,7 @@ export class MongoService {
    * const exists = await mongoDBService.isExists('users')
    */
   public async isExists(name: string): Promise<boolean> {
-    const collections = await this.db.listCollections().toArray();
+    const collections = await this.database.listCollections().toArray();
 
     return collections.some((collection) => collection.name === name);
   }
@@ -200,11 +204,11 @@ export class MongoService {
    * @throws {Error} If the database connection is not available.
    */
   public async updateSchema(name: string, schema: unknown): Promise<void> {
-    if (!this.db) {
+    if (!this.database) {
       throw new Error('Database not found');
     }
 
-    await this.db.command({
+    await this.database.command({
       collMod: name,
       validator: {
         $jsonSchema: schema,
@@ -292,7 +296,7 @@ export class MongoService {
     ];
 
     const [countResult, data] = await Promise.all([
-      this.db
+      this.database
         .collection(collection)
         .aggregate<{ totalDocuments: number }>(
           countPipeline,
@@ -300,7 +304,7 @@ export class MongoService {
         )
         .toArray(),
 
-      this.db
+      this.database
         .collection(collection)
         .aggregate<T>(
           dataPipeline,
@@ -312,7 +316,7 @@ export class MongoService {
     const totalDocuments = countResult[0]?.totalDocuments ?? 0;
 
     return {
-      data,
+      data: fromObjectIds(data, options.objectIdFields ?? []),
       pagination: {
         page,
         page_size: pageSize,
@@ -321,7 +325,6 @@ export class MongoService {
       },
     };
   }
-
 
   /**
    * Retrieves a single document by its ID.
@@ -360,9 +363,15 @@ export class MongoService {
   public async retrieveOne<T extends Document>(
     collection: string,
     _id: string | ObjectId,
-    options?: FindOneOptions,
+    options?: {
+      objectIdFields: readonly string[],
+      findOneOptions: FindOneOptions
+    },
   ): Promise<T | null> {
-    const objectId = typeof _id === 'string' ? new ObjectId(_id) : _id;
-    return await this.db.collection(collection).findOne<T>({ _id: objectId }, options);
+    const response = await this.database.collection(collection).findOne<T>({ _id: new ObjectId(_id) }, options?.findOneOptions);
+
+    if (!response) return null;
+
+    return fromObjectIds(response, options?.objectIdFields ?? []);
   }
 }
