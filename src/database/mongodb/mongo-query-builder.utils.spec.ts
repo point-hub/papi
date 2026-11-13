@@ -6,6 +6,7 @@ import {
   addDateRangeFilter,
   addExactFilter,
   addNumberFilter,
+  addObjectIdFilter,
   addRegexFilter,
   buildUpdateData,
   calculateSkip,
@@ -321,33 +322,128 @@ describe('MongoQueryBuilder', () => {
     });
   });
 
+
   describe('addExactFilter', () => {
-    it('adds an exact-match filter', () => {
+    it('adds a filter with a string value', () => {
       const filters: Record<string, unknown>[] = [];
 
-      addExactFilter(filters, 'status', 'active');
+      addExactFilter(filters, 'name', 'John');
+
+      expect(filters).toEqual([{ name: 'John' }]);
+    });
+
+    it('trims string values before adding the filter', () => {
+      const filters: Record<string, unknown>[] = [];
+
+      addExactFilter(filters, 'name', '  John  ');
+
+      expect(filters).toEqual([{ name: 'John' }]);
+    });
+
+    it('adds a filter with a non-string value', () => {
+      const filters: Record<string, unknown>[] = [];
+
+      addExactFilter(filters, 'age', 25);
+
+      expect(filters).toEqual([{ age: 25 }]);
+    });
+
+    it('adds false and zero values', () => {
+      const filters: Record<string, unknown>[] = [];
+
+      addExactFilter(filters, 'is_active', false);
+      addExactFilter(filters, 'count', 0);
 
       expect(filters).toEqual([
-        { status: 'active' },
+        { is_active: false },
+        { count: 0 },
       ]);
     });
 
-    it('trims the filter value', () => {
+    it('does not add a filter when the value is undefined', () => {
       const filters: Record<string, unknown>[] = [];
 
-      addExactFilter(filters, 'status', ' active ');
+      addExactFilter(filters, 'name', undefined);
+
+      expect(filters).toEqual([]);
+    });
+
+    it('does not add a filter when the value is null', () => {
+      const filters: Record<string, unknown>[] = [];
+
+      addExactFilter(filters, 'name', null);
+
+      expect(filters).toEqual([]);
+    });
+
+    it('does not add a filter when the string is empty', () => {
+      const filters: Record<string, unknown>[] = [];
+
+      addExactFilter(filters, 'name', '');
+
+      expect(filters).toEqual([]);
+    });
+
+    it('does not add a filter when the string contains only whitespace', () => {
+      const filters: Record<string, unknown>[] = [];
+
+      addExactFilter(filters, 'name', '   ');
+
+      expect(filters).toEqual([]);
+    });
+  });
+
+  describe('addObjectIdFilter', () => {
+    it('adds a filter with a valid ObjectId', () => {
+      const filters: Record<string, unknown>[] = [];
+      const id = new ObjectId();
+
+      addObjectIdFilter(filters, 'user_id', id.toHexString());
 
       expect(filters).toEqual([
-        { status: 'active' },
+        { user_id: id },
       ]);
     });
 
-    it('does not add a filter for empty values', () => {
+    it('trims the ObjectId string before validation', () => {
+      const filters: Record<string, unknown>[] = [];
+      const id = new ObjectId();
+
+      addObjectIdFilter(filters, 'user_id', `  ${id.toHexString()}  `);
+
+      expect(filters).toEqual([
+        { user_id: id },
+      ]);
+    });
+
+    it('does not add a filter when the ObjectId is invalid', () => {
       const filters: Record<string, unknown>[] = [];
 
-      addExactFilter(filters, 'status', '');
-      addExactFilter(filters, 'status', '   ');
-      addExactFilter(filters, 'status');
+      addObjectIdFilter(filters, 'user_id', 'invalid-id');
+
+      expect(filters).toEqual([]);
+    });
+
+    it('does not add a filter when the value is empty', () => {
+      const filters: Record<string, unknown>[] = [];
+
+      addObjectIdFilter(filters, 'user_id', '');
+
+      expect(filters).toEqual([]);
+    });
+
+    it('does not add a filter when the value contains only whitespace', () => {
+      const filters: Record<string, unknown>[] = [];
+
+      addObjectIdFilter(filters, 'user_id', '   ');
+
+      expect(filters).toEqual([]);
+    });
+
+    it('does not add a filter when the value is undefined', () => {
+      const filters: Record<string, unknown>[] = [];
+
+      addObjectIdFilter(filters, 'user_id', undefined);
 
       expect(filters).toEqual([]);
     });

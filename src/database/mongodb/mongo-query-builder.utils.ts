@@ -261,24 +261,55 @@ export const addRegexFilter = (filters: Record<string, unknown>[], field: string
 };
 
 /**
- * Adds an exact-match filter to the filters array if a value is provided.
+ * Adds an exact-match filter when the value is not null, undefined, or an empty string.
+ * String values are trimmed before being added to the filters array.
  *
- * @param filters - An array of MongoDB filter objects to be modified.
- * @param field - The field name to match exactly.
- * @param value - The exact value to match (optional). If empty or only whitespace, no filter is added.
- *
- * @example
- * const filters: Record<string, unknown>[] = []
- *
- * addExactFilter(filters, 'status', 'active')
- *
- * // Result:
- * // [{ status: 'active' }]
+ * @template T - The type of the filter value.
+ * @param filters - The array of MongoDB filter conditions.
+ * @param field - The field name to filter by.
+ * @param value - The value to match exactly. Null, undefined, and empty strings are ignored.
  */
-export const addExactFilter = (filters: Record<string, unknown>[], field: string, value?: string) => {
-  if (value?.trim()) {
-    filters.push({ [field]: value.trim() });
+export const addExactFilter = <T>(
+  filters: Record<string, unknown>[],
+  field: string,
+  value?: T | null,
+): void => {
+  if (value === undefined || value === null) {
+    return;
   }
+
+  if (typeof value === 'string' && !value.trim()) {
+    return;
+  }
+
+  filters.push({
+    [field]: typeof value === 'string' ? value.trim() : value,
+  });
+};
+
+/**
+ * Adds an exact-match ObjectId filter when the provided value is a valid ObjectId.
+ * The value is trimmed before validation and converted to a MongoDB ObjectId.
+ * Invalid, null, undefined, and empty values are ignored.
+ *
+ * @param filters - The array of MongoDB filter conditions.
+ * @param field - The field name to filter by.
+ * @param value - The string representation of the ObjectId.
+ */
+export const addObjectIdFilter = (
+  filters: Record<string, unknown>[],
+  field: string,
+  value?: string,
+): void => {
+  if (!value?.trim()) return;
+
+  if (!ObjectId.isValid(value.trim())) return;
+
+  addExactFilter(
+    filters,
+    field,
+    new ObjectId(value.trim()),
+  );
 };
 
 /**
@@ -913,6 +944,7 @@ export default {
   excludeFields,
   addRegexFilter,
   addExactFilter,
+  addObjectIdFilter,
   parseBoolean,
   addBooleanFilter,
   addDateRangeFilter,
