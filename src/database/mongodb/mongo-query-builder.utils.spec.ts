@@ -1156,6 +1156,56 @@ describe('MongoQueryBuilder', () => {
       expect(result._id).toBe(ID_1);
       expect(result.name).toBe('Admin');
     });
+
+    it('converts ObjectId-like values created by another bson copy', () => {
+      const foreign = { _bsontype: 'ObjectId', toHexString: () => ID_1 };
+
+      const result = fromObjectIds({ _id: foreign }, ['_id']);
+
+      expect(result).toEqual({ _id: ID_1 });
+    });
+
+    it('converts ObjectId-like values with the legacy "ObjectID" marker', () => {
+      const legacy = { _bsontype: 'ObjectID', toHexString: () => ID_1 };
+
+      const result = fromObjectIds({ _id: legacy }, ['_id']);
+
+      expect(result).toEqual({ _id: ID_1 });
+    });
+
+    it('converts foreign ObjectId-like values inside arrays and nested paths', () => {
+      const foreign1 = { _bsontype: 'ObjectId', toHexString: () => ID_1 };
+      const foreign2 = { _bsontype: 'ObjectId', toHexString: () => ID_2 };
+
+      const result = fromObjectIds(
+        {
+          permission_ids: [foreign1, foreign2],
+          approvers: [{ user_id: foreign1 }, { user_id: foreign2 }],
+        },
+        ['permission_ids', 'approvers.user_id'],
+      );
+
+      expect(result).toEqual({
+        permission_ids: [ID_1, ID_2],
+        approvers: [{ user_id: ID_1 }, { user_id: ID_2 }],
+      });
+    });
+
+    it('does not convert objects with a different _bsontype', () => {
+      const decimal = { _bsontype: 'Decimal128', toHexString: () => 'nope' };
+
+      const result = fromObjectIds({ amount: decimal }, ['amount']) as Record<string, unknown>;
+
+      expect(result['amount']).toBe(decimal);
+    });
+
+    it('does not convert plain objects without a _bsontype', () => {
+      const plain = { toHexString: () => 'nope' };
+
+      const result = fromObjectIds({ value: plain }, ['value']) as Record<string, unknown>;
+
+      expect(result['value']).toBe(plain);
+    });
   });
 
   describe('toObjectIds and fromObjectIds round trip', () => {

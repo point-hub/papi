@@ -750,9 +750,53 @@ const stringToObjectId = (value: unknown): unknown =>
     ? new ObjectId(value)
     : value;
 
-/** Converts an `ObjectId` to its hex string, leaves everything else as is. */
+/**
+ * Checks whether a value is a BSON `ObjectId`, without using `instanceof`.
+ *
+ * `instanceof` fails when the value was created by a different copy of the
+ * `bson` package than the one imported here (for example the CJS build used
+ * by the `mongodb` driver versus the ESM build, or a duplicated install).
+ * Every BSON value carries a `_bsontype` marker, so checking it works across
+ * copies. Older `bson` versions use `'ObjectID'` and newer ones use
+ * `'ObjectId'`, so both spellings are accepted.
+ *
+ * @param value - Value to check.
+ * @returns `true` if the value looks like an `ObjectId` and exposes `toHexString()`.
+ *
+ * @example
+ * ```ts
+ * isObjectId(new ObjectId());   // true
+ * isObjectId('665f1c2e8a1b2c3d4e5f6a7b'); // false
+ * isObjectId(null);             // false
+ * isObjectId({ _id: 1 });       // false
+ * ```
+ */
+const isObjectId = (value: unknown): value is { toHexString(): string } =>
+  typeof value === 'object' &&
+  value !== null &&
+  ['ObjectId', 'ObjectID'].includes((value as { _bsontype?: string })._bsontype ?? '');
+
+/**
+ * Converts an `ObjectId` to its 24-character hex string.
+ *
+ * Any value that is not an `ObjectId` (strings, numbers, `null`, `undefined`,
+ * dates, plain objects, and so on) is returned as is, so it is safe to apply
+ * to every leaf value of a document.
+ *
+ * @param value - Value to convert.
+ * @returns The hex string if `value` is an `ObjectId`, otherwise `value` unchanged.
+ *
+ * @example
+ * ```ts
+ * objectIdToString(new ObjectId('665f1c2e8a1b2c3d4e5f6a7b'));
+ * // '665f1c2e8a1b2c3d4e5f6a7b'
+ *
+ * objectIdToString('665f1c2e8a1b2c3d4e5f6a7b'); // unchanged (already a string)
+ * objectIdToString(undefined);                  // undefined
+ * ```
+ */
 const objectIdToString = (value: unknown): unknown =>
-  value instanceof ObjectId ? value.toHexString() : value;
+  isObjectId(value) ? value.toHexString() : value;
 
 /**
  * Converts the listed fields of a document from string IDs to `ObjectId`.
