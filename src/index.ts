@@ -1,12 +1,3 @@
-import {
-  ApiError,
-  BaseError,
-  errorHandlerMiddleware,
-  find,
-  invalidPathMiddleware,
-  isTrustedError,
-  type TypeCodeStatus,
-} from '@point-hub/express-error-handler';
 import path from 'path';
 export const stubDir = path.resolve(import.meta.dir, '../stub');
 // Abstact Class
@@ -23,18 +14,13 @@ export { MongoTestService } from './database/mongodb/mongo-test.service';
 // Factory
 export { default as BaseFactory } from '@point-hub/express-factory';
 // Error Handler
-export const BaseErrorHandler = {
-  ApiError,
-  BaseError,
-  isTrustedError,
-  getHttpError: find,
-  errorHandlerMiddleware,
-  invalidPathMiddleware,
-};
+export { default as errorHandlerMiddleware } from './middlewares/error-handler-middleware';
+export { default as invalidPathMiddleware } from './middlewares/invalid-path-middleware';
+export { default as ApiError } from './utils/errors/api-error';
+export { default as BaseError, isTrustedError } from './utils/errors/base-error';
 // Server
 export { Server as BaseServer } from './server';
 // Types
-export type { TypeCodeStatus };
 export type {
   IAggregateOutput,
   IAggregateRepository,
