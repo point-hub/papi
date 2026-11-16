@@ -52,7 +52,7 @@ describe('make:command', () => {
     shell.rm('-rf', `${dir}/${makeCommand.args.name}`);
 
     expect(console.error).toHaveBeenCalled();
-    expect(console.error).toHaveBeenCalledWith(Color.red('Command directory is exists'));
+    expect(console.error).toHaveBeenCalledWith(Color.red('Command directory already exists'));
     expect(spy).toHaveBeenCalled();
   });
 });

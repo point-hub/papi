@@ -92,7 +92,7 @@ describe('handleUniqueValidation', () => {
     const result = handleUniqueValidation(err);
 
     expect(result.errors).toStrictEqual({
-      email: ['The email is exists.'],
+      email: ['The email already exists.'],
     });
   });
 
@@ -108,10 +108,10 @@ describe('handleUniqueValidation', () => {
 
     expect(result.errors).toStrictEqual({
       first_name: [
-        'The combination of \'first_name, last_name\' is exists.',
+        'The combination of \'first_name, last_name\' already exists.',
       ],
       last_name: [
-        'The combination of \'first_name, last_name\' is exists.',
+        'The combination of \'first_name, last_name\' already exists.',
       ],
     });
   });
@@ -150,7 +150,7 @@ describe('MongoErrorHandler', () => {
     const error = new MongoErrorHandler(err);
 
     expect(error.errors).toStrictEqual({
-      email: ['The email is exists.'],
+      email: ['The email already exists.'],
     });
   });
 
@@ -161,7 +161,7 @@ describe('MongoErrorHandler', () => {
 
     const error = new MongoErrorHandler(err);
 
-    expect(consoleSpy).toHaveBeenCalledWith(JSON.stringify(err));
+    expect(consoleSpy.mock.calls[0][1]).toBe(err);
     expect(error.name).toBe('MongoErrorHandler');
     expect(error.isOperational).toBe(true);
   });

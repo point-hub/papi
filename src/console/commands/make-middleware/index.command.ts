@@ -31,13 +31,13 @@ export default class MakeMiddleware extends BaseCommand {
   async handle(): Promise<void> {
     const directory = path.resolve(
       process.cwd(),
-      'src/middleware',
+      'src/middlewares',
       kebabCase(this.args.name),
     );
 
     // Check if middleware directory already exists
     if (fs.existsSync(directory)) {
-      console.error(Color.red('Middleware directory is exists'));
+      console.error(Color.red('Middleware directory already exists'));
       return;
     }
 
@@ -62,38 +62,38 @@ export default class MakeMiddleware extends BaseCommand {
   private copyMiddleware() {
     // Copy middleware file
     const stubMiddleware = fs
-      .readFileSync(path.resolve(stubDir, './middleware/new.middleware.ts'))
+      .readFileSync(path.resolve(stubDir, './middlewares/new.middleware.ts'))
       .toString()
       .replace('NewMiddleware', `${pascalCase(this.args.name)}Middleware`);
-    fs.writeFileSync(`${process.cwd()}/src/middleware/${kebabCase(this.args.name)}/index.middleware.ts`, stubMiddleware);
+    fs.writeFileSync(`${process.cwd()}/src/middlewares/${kebabCase(this.args.name)}/index.middleware.ts`, stubMiddleware);
 
     // Copy test file
     const stubTest = fs
-      .readFileSync(path.resolve(stubDir, './middleware/new.spec.ts'))
+      .readFileSync(path.resolve(stubDir, './middlewares/new.spec.ts'))
       .toString()
       .replace('new.middleware.ts', 'index.middleware.ts');
-    fs.writeFileSync(`${process.cwd()}/src/middleware/${kebabCase(this.args.name)}/index.spec.ts`, stubTest);
+    fs.writeFileSync(`${process.cwd()}/src/middlewares/${kebabCase(this.args.name)}/index.spec.ts`, stubTest);
 
-    console.info(`src/middleware/${kebabCase(this.args.name)}/index.middleware.ts`, 'has been created');
-    console.info(`src/middleware/${kebabCase(this.args.name)}/index.spec.ts`, 'has been created');
+    console.info(`src/middlewares/${kebabCase(this.args.name)}/index.middleware.ts`, 'has been created');
+    console.info(`src/middlewares/${kebabCase(this.args.name)}/index.spec.ts`, 'has been created');
   }
 
   private copyConfigureableMiddleware() {
     // Copy middleware file
     const stubMiddleware = fs
-      .readFileSync(path.resolve(stubDir, './middleware/configurable.middleware.ts'))
+      .readFileSync(path.resolve(stubDir, './middlewares/configurable.middleware.ts'))
       .toString()
       .replace('NewMiddleware', `${pascalCase(this.args.name)}Middleware`);
-    fs.writeFileSync(`${process.cwd()}/src/middleware/${kebabCase(this.args.name)}/index.middleware.ts`, stubMiddleware);
+    fs.writeFileSync(`${process.cwd()}/src/middlewares/${kebabCase(this.args.name)}/index.middleware.ts`, stubMiddleware);
 
     // Copy test file
     const stubTest = fs
-      .readFileSync(path.resolve(stubDir, './middleware/configurable.spec.ts'))
+      .readFileSync(path.resolve(stubDir, './middlewares/configurable.spec.ts'))
       .toString()
       .replace('configurable.middleware.ts', 'index.middleware.ts');
-    fs.writeFileSync(`${process.cwd()}/src/middleware/${kebabCase(this.args.name)}/index.spec.ts`, stubTest);
+    fs.writeFileSync(`${process.cwd()}/src/middlewares/${kebabCase(this.args.name)}/index.spec.ts`, stubTest);
 
-    console.info(`src/middleware/${kebabCase(this.args.name)}/index.middleware.ts`, 'has been created');
-    console.info(`src/middleware/${kebabCase(this.args.name)}/index.spec.ts`, 'has been created');
+    console.info(`src/middlewares/${kebabCase(this.args.name)}/index.middleware.ts`, 'has been created');
+    console.info(`src/middlewares/${kebabCase(this.args.name)}/index.spec.ts`, 'has been created');
   }
 }

@@ -1,4 +1,4 @@
-import { BaseCommand } from '@point-hub/express-cli'
+import { BaseCommand } from '@point-hub/express-cli';
 
 export default class NewCommand extends BaseCommand {
   constructor() {
@@ -7,8 +7,8 @@ export default class NewCommand extends BaseCommand {
       description: '[description]',
       summary: '[summary]',
       arguments: [],
-      options: []
-    })
+      options: [],
+    });
   }
   async handle(): Promise<void> {
     //

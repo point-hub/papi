@@ -6,7 +6,7 @@ import shell from 'shelljs';
 
 import MakeMiddlewareCommand from './index.command';
 
-const dir = `${process.cwd()}/src/middleware`;
+const dir = `${process.cwd()}/src/middlewares`;
 
 const createdDirectories: string[] = [];
 
@@ -99,7 +99,7 @@ describe('make:middleware', () => {
     await command.handle();
 
     expect(consoleError).toHaveBeenCalledWith(
-      Color.red('Middleware directory is exists'),
+      Color.red('Middleware directory already exists'),
     );
   });
 });

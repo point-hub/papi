@@ -23,7 +23,7 @@ export default class MakeCommand extends BaseCommand {
   async handle(): Promise<void> {
     // Check if command directory is already exists
     if (fs.existsSync(`${process.cwd()}/src/console/commands/${kebabCase(this.args.name)}`)) {
-      console.error(Color.red('Command directory is exists'));
+      console.error(Color.red('Command directory already exists'));
       return;
     }
 
@@ -32,7 +32,7 @@ export default class MakeCommand extends BaseCommand {
 
     // Copy command file
     const stubCommand = fs
-      .readFileSync(path.resolve(stubDir, './command/index.command.ts'))
+      .readFileSync(path.resolve(stubDir, './commands/index.command.ts'))
       .toString()
       .replace('[name]', kebabCase(this.args.name))
       .replace('NewCommand', `${pascalCase(this.args.name)}Command`);
@@ -40,7 +40,7 @@ export default class MakeCommand extends BaseCommand {
 
     // Copy test file
     const stubTest = fs
-      .readFileSync(path.resolve(stubDir, './command/index.spec.ts'))
+      .readFileSync(path.resolve(stubDir, './commands/index.spec.ts'))
       .toString()
       .replace(/NewCommand/g, `${pascalCase(this.args.name)}Command`)
       .replace(/newCommand/g, `${camelCase(this.args.name)}Command`);
