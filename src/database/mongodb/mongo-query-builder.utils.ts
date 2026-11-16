@@ -1,6 +1,8 @@
 import type { SortDirection } from 'mongodb';
 import { ObjectId } from 'mongodb';
 
+import isPlainObject from '../../utils/object/is-plain-object';
+
 export interface IFieldsObject {
   [key: string]: number
 }
@@ -558,25 +560,6 @@ export const parseComparisons = (
 };
 
 /**
- * Checks whether a value is a plain object.
- *
- * Plain objects have either Object.prototype or null as their prototype.
- * Arrays, Dates, ObjectIds, and other class instances are excluded.
- *
- * @param value - Value to check.
- * @returns True if the value is a plain object.
- */
-export const isPlainObject = (value: unknown): value is Record<string, unknown> => {
-  if (typeof value !== 'object' || value === null) {
-    return false;
-  }
-
-  const prototype = Object.getPrototypeOf(value);
-
-  return prototype === Object.prototype || prototype === null;
-};
-
-/**
  * Builds a MongoDB update document from input data.
  *
  * Nested plain objects are recursively flattened into dot-notation paths.
@@ -950,7 +933,6 @@ export default {
   addDateRangeFilter,
   addNumberFilter,
   parseComparisons,
-  isPlainObject,
   buildUpdateData,
   toObjectIds,
   fromObjectIds,

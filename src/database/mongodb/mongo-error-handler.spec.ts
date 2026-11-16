@@ -1,4 +1,3 @@
-import { find } from '@point-hub/express-error-handler';
 import { describe, expect, it, spyOn } from 'bun:test';
 import { MongoServerError } from 'mongodb';
 
@@ -21,10 +20,6 @@ function createMongoServerError(
   return error;
 }
 
-function createError() {
-  return find(422)!;
-}
-
 describe('handleSchemaValidation', () => {
   it('returns required validation errors for multiple missing properties', () => {
     const err = createMongoServerError(121, {
@@ -39,7 +34,7 @@ describe('handleSchemaValidation', () => {
       },
     });
 
-    const result = handleSchemaValidation(err, createError());
+    const result = handleSchemaValidation(err);
 
     expect(result.errors).toStrictEqual({
       name: ['name is required'],
@@ -60,7 +55,7 @@ describe('handleSchemaValidation', () => {
       },
     });
 
-    const result = handleSchemaValidation(err, createError());
+    const result = handleSchemaValidation(err);
 
     expect(result.errors).toStrictEqual({
       name: ['name is required'],
@@ -80,7 +75,7 @@ describe('handleSchemaValidation', () => {
       },
     });
 
-    const result = handleSchemaValidation(err, createError());
+    const result = handleSchemaValidation(err);
 
     expect(result.errors).toStrictEqual({});
   });
@@ -94,7 +89,7 @@ describe('handleUniqueValidation', () => {
       },
     });
 
-    const result = handleUniqueValidation(err, createError());
+    const result = handleUniqueValidation(err);
 
     expect(result.errors).toStrictEqual({
       email: ['The email is exists.'],
@@ -109,7 +104,7 @@ describe('handleUniqueValidation', () => {
       },
     });
 
-    const result = handleUniqueValidation(err, createError());
+    const result = handleUniqueValidation(err);
 
     expect(result.errors).toStrictEqual({
       first_name: [

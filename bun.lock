@@ -6,7 +6,6 @@
       "name": "@point-hub/papi",
       "dependencies": {
         "@point-hub/express-cli": "^0.2.2",
-        "@point-hub/express-error-handler": "^0.2.2",
         "@point-hub/express-factory": "^1.1.4",
         "@point-hub/express-utils": "^0.2.12",
         "date-fns": "^4.4.0",
@@ -87,8 +86,6 @@
     "@nodelib/fs.walk": ["@nodelib/fs.walk@1.2.8", "", { "dependencies": { "@nodelib/fs.scandir": "2.1.5", "fastq": "^1.6.0" } }, "sha512-oGB+UxlgWcgQkgwo8GcEGwemoTFt3FIO9ababBmaGwXIoBKZ+GTy0pP185beGg7Llih/NSHSV2XAs1lnznocSg=="],
 
     "@point-hub/express-cli": ["@point-hub/express-cli@0.2.2", "", { "dependencies": { "arg": "^5.0.2", "cli-table3": "^0.6.2", "colorette": "^2.0.19", "prompts": "^2.4.2" } }, "sha512-tF/gJJGm+JCIaDCKZ9ZWRKnhlIogqYUXq3ZoA98X4GgIiBIC6k8A45Y6UZeHPREiUUrJzc+C22AG1Mvv/g7uTQ=="],
-
-    "@point-hub/express-error-handler": ["@point-hub/express-error-handler@0.2.2", "", {}, "sha512-AYzrbpZfYqCjnnRy/68aeZ75UKAQvrCbIIJEWvgePAMipoQM0xyCUpcgSYJBllI65XUs6kP8fnrcaWUYwfRE8g=="],
 
     "@point-hub/express-factory": ["@point-hub/express-factory@1.1.4", "", {}, "sha512-LNx61RLGk7//Q8+DL+Hs2astACaqLfH4V568dNhfcZtvBd9ZWw+yE7ihYjblRECOOoY7QBrgwaLvnle3RFxFgA=="],
 

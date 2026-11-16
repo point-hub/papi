@@ -1,10 +1,31 @@
-import {
-  BaseError,
-  find,
-  type IError,
-  type IHttpStatus,
-} from '@point-hub/express-error-handler';
-import { MongoServerError } from 'mongodb';
+
+import { STATUS_CODES } from 'node:http';
+
+import type { MongoServerError } from 'mongodb';
+
+import BaseError, { type IError } from '../../utils/errors/base-error';
+
+const VALIDATION_CODE = 422;
+
+/**
+ * Creates the default HTTP validation error.
+ *
+ * @returns Standardized HTTP 422 error data.
+ */
+function createValidationError(): IError {
+  const status = STATUS_CODES[VALIDATION_CODE];
+
+  if (!status) {
+    throw new Error(`Invalid HTTP status code: "${VALIDATION_CODE}"`);
+  }
+
+  return {
+    name: 'ClientError',
+    code: VALIDATION_CODE,
+    status,
+    message: status,
+  };
+}
 
 /**
  * Converts a MongoDB schema validation error into an HTTP validation error.
@@ -13,15 +34,15 @@ import { MongoServerError } from 'mongodb';
  * and generates a validation message for each missing property.
  *
  * @param err - MongoDB server error with code 121.
- * @param error - HTTP validation error to populate.
- * @returns The HTTP validation error containing missing property errors.
+ * @returns HTTP validation error containing missing property errors.
  */
-export function handleSchemaValidation(err: MongoServerError, error: IError): IError {
-  const missingProperties =
-    err.errInfo?.details.schemaRulesNotSatisfied[0].missingProperties ?? [];
+export function handleSchemaValidation(err: MongoServerError): IError {
+  const error = createValidationError();
+
+  const missingProperties: string[] = err.errInfo?.details?.schemaRulesNotSatisfied?.[0]?.missingProperties ?? [];
 
   error.errors = Object.fromEntries(
-    missingProperties.map((property: string) => [
+    missingProperties.map(property => [
       property,
       [`${property} is required`],
     ]),
@@ -37,30 +58,32 @@ export function handleSchemaValidation(err: MongoServerError, error: IError): IE
  * combination of fields when a compound unique index is violated.
  *
  * @param err - MongoDB server error with code 11000.
- * @param error - HTTP validation error to populate.
- * @returns The HTTP validation error containing duplicate key errors.
+ * @returns HTTP validation error containing duplicate key errors.
  */
-export function handleUniqueValidation(err: MongoServerError, error: IError): IError {
-  const keys = Object.keys(err.keyPattern);
+export function handleUniqueValidation(err: MongoServerError): IError {
+  const error = createValidationError();
+  const keys = Object.keys(err.keyPattern ?? {});
 
   if (keys.length === 1) {
-    const key = keys[0];
+    const key = keys[0]!;
 
     error.errors = {
-      [key]: [`The ${key} is exists.`],
+      [key]: [`The ${key} already exists.`],
     };
 
     return error;
   }
 
-  const combination = `'${keys.join(', ')}'`;
+  if (keys.length > 1) {
+    const combination = `'${keys.join(', ')}'`;
 
-  error.errors = Object.fromEntries(
-    keys.map(key => [
-      key,
-      [`The combination of ${combination} is exists.`],
-    ]),
-  );
+    error.errors = Object.fromEntries(
+      keys.map(key => [
+        key,
+        [`The combination of ${combination} already exists.`],
+      ]),
+    );
+  }
 
   return error;
 }
@@ -82,16 +105,32 @@ export class MongoErrorHandler extends BaseError {
    * @param err - MongoDB server error to handle.
    */
   constructor(err: MongoServerError) {
-    const error: IError = find(422) as IHttpStatus;
+    let error: IError;
 
-    if (err.code === 121) {
-      super(handleSchemaValidation(err, error));
-    } else if (err.code === 11000) {
-      super(handleUniqueValidation(err, error));
-    } else {
-      console.error(JSON.stringify(err));
-      super(error);
+    switch (err.code) {
+    case 121:
+      error = handleSchemaValidation(err);
+      break;
+
+    case 11000:
+      error = handleUniqueValidation(err);
+      break;
+
+    default: {
+      console.error('[MongoErrorHandler]', err);
+
+      const status = STATUS_CODES[500]!;
+
+      error = {
+        name: 'ServerError',
+        code: 500,
+        status,
+        message: status,
+      };
     }
+    }
+
+    super(error);
 
     Object.setPrototypeOf(this, new.target.prototype);
   }
@@ -99,14 +138,14 @@ export class MongoErrorHandler extends BaseError {
   /**
    * Indicates whether the error is operational and expected to be handled.
    */
-  get isOperational() {
+  override get isOperational(): boolean {
     return true;
   }
 
   /**
    * Returns the error class name.
    */
-  override get name() {
+  override get name(): string {
     return 'MongoErrorHandler';
   }
 }
