@@ -295,23 +295,21 @@ export class MongoService {
       ...options?.afterPagination ?? [],
     ];
 
-    const [countResult, data] = await Promise.all([
-      this.database
-        .collection(collection)
-        .aggregate<{ totalDocuments: number }>(
-          countPipeline,
-          options.aggregateOptions,
-        )
-        .toArray(),
+    const countResult = await this.database
+      .collection(collection)
+      .aggregate<{ totalDocuments: number }>(
+        countPipeline,
+        options.aggregateOptions,
+      )
+      .toArray();
 
-      this.database
-        .collection(collection)
-        .aggregate<T>(
-          dataPipeline,
-          options.aggregateOptions,
-        )
-        .toArray(),
-    ]);
+    const data = await this.database
+      .collection(collection)
+      .aggregate<T>(
+        dataPipeline,
+        options.aggregateOptions,
+      )
+      .toArray();
 
     const totalDocuments = countResult[0]?.totalDocuments ?? 0;
 
